@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models;
+package com.angrydwarfs.framework.payload.request;
 
-/**
- * Уровни видимости для пользователя USER с разной степенью детализации
- * Уровни видимости для пользователей с разными уровнями доступа USER, MODERATOR, ADMINISTRATOR
- */
-public final class Views {
-    public interface UserShortData {}
+import lombok.Getter;
+import lombok.Setter;
 
-    public interface UserMiddleData extends UserShortData {}
+import javax.validation.constraints.NotBlank;
 
-    public interface UserAllData extends UserMiddleData {}
+@Getter
+@Setter
+public class LoginRequest {
+    @NotBlank
+    private String userName;
 
-    public interface ModData extends UserAllData {}
-
-    public interface AdminData extends ModData {}
-
+    @NotBlank
+    private String password;
 
 }

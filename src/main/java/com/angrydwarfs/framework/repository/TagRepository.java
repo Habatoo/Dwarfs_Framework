@@ -1,6 +1,6 @@
 package com.angrydwarfs.framework.repository;
 
-import com.angrydwarfs.framework.models.ETag;
+import com.angrydwarfs.framework.models.Enums.ETag;
 import com.angrydwarfs.framework.models.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

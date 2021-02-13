@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models;
+package com.angrydwarfs.framework.payload.response;
 
-/**
- * Уровни видимости для пользователя USER с разной степенью детализации
- * Уровни видимости для пользователей с разными уровнями доступа USER, MODERATOR, ADMINISTRATOR
- */
-public final class Views {
-    public interface UserShortData {}
+public class MessageResponse {
+    private String message;
 
-    public interface UserMiddleData extends UserShortData {}
+    public MessageResponse(String message) {
+        this.message = message;
+    }
 
-    public interface UserAllData extends UserMiddleData {}
+    public String getMessage() {
+        return message;
+    }
 
-    public interface ModData extends UserAllData {}
-
-    public interface AdminData extends ModData {}
-
-
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

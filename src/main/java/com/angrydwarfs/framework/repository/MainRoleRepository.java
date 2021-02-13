@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models;
+package com.angrydwarfs.framework.repository;
 
-/**
- * Уровни видимости для пользователя USER с разной степенью детализации
- * Уровни видимости для пользователей с разными уровнями доступа USER, MODERATOR, ADMINISTRATOR
- */
-public final class Views {
-    public interface UserShortData {}
+import com.angrydwarfs.framework.models.Enums.EMainRole;
+import com.angrydwarfs.framework.models.MainRole;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-    public interface UserMiddleData extends UserShortData {}
+import java.util.Optional;
 
-    public interface UserAllData extends UserMiddleData {}
-
-    public interface ModData extends UserAllData {}
-
-    public interface AdminData extends ModData {}
-
-
+@Repository
+public interface MainRoleRepository extends JpaRepository<MainRole, Long> {
+    Optional<MainRole> findByMainRoleName(EMainRole mainRoleName);
 }

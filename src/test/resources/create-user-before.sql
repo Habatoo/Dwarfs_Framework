@@ -1,6 +1,7 @@
 DELETE FROM activity;
 DELETE FROM levels;
 DELETE FROM main_roles;
+DELETE FROM status;
 DELETE FROM sub_roles;
 DELETE FROM tags;
 DELETE FROM tokens;
@@ -23,12 +24,12 @@ INSERT INTO tags(id, tag_name) VALUES
 (2, 'FITNESS'),
 (3, 'CROSSFIT');
 
---INSERT INTO status(id, status_name) VALUES
---(1, 'COMMON'),
---(2, 'READ_ONLY'),
---(3, 'NO_ACTIVITY'),
---(4, 'BAN'),
---(5, 'CLEAR');
+INSERT INTO status(id, user_status) VALUES
+(1, 'COMMON'),
+(2, 'READ_ONLY'),
+(3, 'NO_ACTIVITY'),
+(4, 'BAN'),
+(5, 'CLEAR');
 
 INSERT INTO levels(id, level_name) VALUES
 (1, 'FIRST_LEVEL'),
@@ -45,6 +46,6 @@ INSERT INTO levels(id, level_name) VALUES
 INSERT INTO usr(id, user_name, user_email, password, creation_date, activation_email_status) VALUES
 (1, 'admin', 'admin@admin.com', '$2a$10$EfVS7r4YFJVUKtoKtipoAuuj.e6z7ed/nEDNGrXB2z6M52d9zmtkW', current_date, true),
 (2, 'mod', 'mod@mod.com', '$2a$10$7JGsM41kbXX7/vJ2lc3pb.wdoIoANWTme.NErCU2TSv1RcPnDaBaS', current_date, true),
-(3, 'user', 'user@user.com', '$2a$10$7JGsM41kbXX7/vJ2lc3pb.wdoIoANWTme.NErCU2TSv1RcPnDaBaS', current_date, true);
+(3, 'user', 'user@user.com', '$2a$10$7JGsM41kbXX7/vJ2lc3pb.wdoIoANWTme.NErCU2TSv1RcPnDaBaS', current_date, false);
 
 alter sequence usr_id_seq restart with 10;

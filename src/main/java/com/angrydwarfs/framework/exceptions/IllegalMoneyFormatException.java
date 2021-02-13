@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models;
+package com.angrydwarfs.framework.exceptions;
 
 /**
- * Уровни видимости для пользователя USER с разной степенью детализации
- * Уровни видимости для пользователей с разными уровнями доступа USER, MODERATOR, ADMINISTRATOR
+ * Исключение - выбрасывается в случае невозможности приведения строки к формату денег
+ * вида ddd...d.dd
  */
-public final class Views {
-    public interface UserShortData {}
-
-    public interface UserMiddleData extends UserShortData {}
-
-    public interface UserAllData extends UserMiddleData {}
-
-    public interface ModData extends UserAllData {}
-
-    public interface AdminData extends ModData {}
-
+public class IllegalMoneyFormatException extends RuntimeException{
+    private String strValue;
+    public String getStrValue() { return strValue; }
+    public IllegalMoneyFormatException(String message, String strValue) {
+        super(message);
+        this.strValue = strValue;
+    }
 
 }

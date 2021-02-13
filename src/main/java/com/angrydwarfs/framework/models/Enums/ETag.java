@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models;
+package com.angrydwarfs.framework.models.Enums;
+
+import com.angrydwarfs.framework.models.Tag;
 
 /**
- * Уровни видимости для пользователя USER с разной степенью детализации
- * Уровни видимости для пользователей с разными уровнями доступа USER, MODERATOR, ADMINISTRATOR
+ * Перечень возможных тэгов пользователя по видам активностей
+ * @see Tag (таблица тегов).
+ * @version 0.001
+ * @author habatoo
  */
-public final class Views {
-    public interface UserShortData {}
-
-    public interface UserMiddleData extends UserShortData {}
-
-    public interface UserAllData extends UserMiddleData {}
-
-    public interface ModData extends UserAllData {}
-
-    public interface AdminData extends ModData {}
-
-
+public enum ETag {
+    JOGGING,
+    FITNESS,
+    CROSSFIT
 }

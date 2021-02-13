@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models;
+package com.angrydwarfs.framework.models.Enums;
+
+import com.angrydwarfs.framework.models.SubRole;
 
 /**
- * Уровни видимости для пользователя USER с разной степенью детализации
- * Уровни видимости для пользователей с разными уровнями доступа USER, MODERATOR, ADMINISTRATOR
+ * Перечень возможных ролей по пользователя по доступам к сервисам и необходимым полям
+ * по предоставлению своих данных.
+ * @see SubRole (таблица ролей).
+ * @version 0.001
+ * @author habatoo
  */
-public final class Views {
-    public interface UserShortData {}
-
-    public interface UserMiddleData extends UserShortData {}
-
-    public interface UserAllData extends UserMiddleData {}
-
-    public interface ModData extends UserAllData {}
-
-    public interface AdminData extends ModData {}
-
-
+public enum ESubRole {
+    COMMON_USER,
+    SILVER_USER,
+    GOLD_USER
 }

@@ -1,6 +1,7 @@
 DELETE FROM activity;
 DELETE FROM levels;
 DELETE FROM main_roles;
+DELETE FROM status;
 DELETE FROM sub_roles;
 DELETE FROM tags;
 DELETE FROM tokens;
