@@ -64,6 +64,9 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String socialNetId;
+    private String userLocale;
+
     @NotBlank(message = "Username cannot be empty")
     @JsonView(Views.UserShortData.class)
     private String userName;
@@ -85,6 +88,10 @@ public class User implements Serializable {
     @JsonView(Views.UserShortData.class)
     private LocalDateTime creationDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonView(Views.UserShortData.class)
+    private LocalDateTime lastVisitedDate;
+
     ///////////////////////////////////////////////
     // User status
     @JsonIdentityInfo(
@@ -105,19 +112,17 @@ public class User implements Serializable {
     private LocalDateTime statusEndDate;
     ////////////////////////////////////////////////////
 
-    @JsonIdentityInfo(
-            generator = ObjectIdGenerators.PropertyGenerator.class,
-            property = "id")
-    @OneToMany(mappedBy = "userMainRoles", fetch = FetchType.EAGER, orphanRemoval = true)
-    //@JsonView(Views.AllData.class)
-    private Set<MainRole> mainRoles;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(	name = "user_main_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "main_role_id"))
+    private Set<MainRole> mainRoles = new HashSet<>();
 
-    @JsonIdentityInfo(
-            generator = ObjectIdGenerators.PropertyGenerator.class,
-            property = "id")
-    @OneToMany(mappedBy = "userSubRoles", fetch = FetchType.EAGER, orphanRemoval = true)
-    //@JsonView(Views.ShortData.class)
-    private Set<SubRole> subRoles;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(	name = "user_sub_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "sub_role_id"))
+    private Set<SubRole> subRoles = new HashSet<>();
 
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,

@@ -16,6 +16,8 @@
 
 package com.angrydwarfs.framework.config;
 
+import com.angrydwarfs.framework.models.User;
+import com.angrydwarfs.framework.repository.UserRepository;
 import com.angrydwarfs.framework.security.jwt.AuthEntryPointJwt;
 import com.angrydwarfs.framework.security.jwt.AuthTokenFilter;
 import com.angrydwarfs.framework.security.services.UserDetailsServiceImpl;
@@ -32,6 +34,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+
+import java.time.LocalDateTime;
 
 @Configuration
 @EnableWebSecurity
@@ -74,9 +79,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests().antMatchers("/api/auth/**").permitAll()
+                .authorizeRequests()
+                .antMatchers("/").permitAll()
+                .antMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
+
 }

@@ -37,7 +37,7 @@ import java.util.Set;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource("/application-test.properties")
+@TestPropertySource(properties = { "spring.config.location=classpath:application-test.yml" })
 @Sql(value = {"/create-user-before.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = {"/create-user-after.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class UserTest {
@@ -215,104 +215,6 @@ public class UserTest {
     }
 
 //    @Test
-//    @DisplayName("Проверяет создание пользователя с ролями ADMIN и USER.")
-//    public void testCreateAdmin() throws Exception{
-//        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-//        tokenUtils.makeToken(username, jwtResponse.getToken());
-//
-//        this.mockMvc.perform(post("/api/auth/users/addUser")
-//                .header("Authorization", "Bearer " + jwtResponse.getToken())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content("{ \"userName\": \"mod\", \"email\": \"mod@mod.com\", \"password\": \"12345\", \"role\": [\"admin\", \"user\"] }"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("message").value("User registered successfully!"));
-//    }
-
-//    @Test
-//    @DisplayName("Проверяет создание пользователя с ролью USER.")
-//    public void testCreateUser() throws Exception{
-//        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-//        tokenUtils.makeToken(username, jwtResponse.getToken());
-//
-//        this.mockMvc.perform(post("/api/auth/users/addUser")
-//                .header("Authorization", "Bearer " + jwtResponse.getToken())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content("{ \"userName\": \"guest\", \"email\": \"guest@guest.com\", \"password\": \"12345\", \"role\": [\"user\"] }"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("message").value("User registered successfully!"));
-//    }
-
-    @Test
-    @DisplayName("Проверяет создание пользователя с ролью ADMIN")
-    public void testCreateAdminAndUser() throws Exception{
-        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-        tokenUtils.makeToken(username, jwtResponse.getToken());
-
-        this.mockMvc.perform(post("/api/auth/users/addUser")
-                .header("Authorization", "Bearer " + jwtResponse.getToken())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"userName\": \"admin2\", \"email\": \"admin2@admin2.com\", \"password\": \"12345\", \"role\": [\"admin\"] }"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("message").value("User registered successfully!"));
-    }
-
-    @Test
-    @DisplayName("Проверяет создание пользователя с существующим userName.")
-    public void testCreateUsernameInDb() throws Exception{
-        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-        tokenUtils.makeToken(username, jwtResponse.getToken());
-
-        this.mockMvc.perform(post("/api/auth/users/addUser")
-                .header("Authorization", "Bearer " + jwtResponse.getToken())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"userName\": \"admin\", \"email\": \"admin2@admin2.com\", \"password\": \"12345\", \"role\": [\"admin\"] }"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("message").value("Error: Username is already taken!"));
-    }
-
-    @Test
-    @DisplayName("Проверяет создание пользователя с существующим email.")
-    public void testCreateEmailInDb() throws Exception{
-        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-        tokenUtils.makeToken(username, jwtResponse.getToken());
-
-        this.mockMvc.perform(post("/api/auth/users/addUser")
-                .header("Authorization", "Bearer " + jwtResponse.getToken())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"userName\": \"admin2\", \"email\": \"admin@admin.com\", \"password\": \"12345\", \"role\": [\"admin\"] }"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("message").value("Error: Email is already in use!"));
-    }
-
-//    @Test
-//    @DisplayName("Проверяет создание пользователя с не существующей ролью.")
-//    public void testCreateRoleNotInDb() throws Exception{
-//        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-//        tokenUtils.makeToken(username, jwtResponse.getToken());
-//
-//        this.mockMvc.perform(post("/api/auth/users/addUser")
-//                .header("Authorization", "Bearer " + jwtResponse.getToken())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content("{ \"userName\": \"cat\", \"email\": \"cat@cat.com\", \"password\": \"12345\", \"role\": [\"cat\"] }"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("message").value("User registered successfully!"));
-//    }
-
-    @Test
-    @DisplayName("Проверяет создание пользователя автором без роли ADMIN")
-    public void testFailCreateUserWithoutAdminRole() throws Exception{
-        JwtResponse jwtResponse = tokenUtils.makeAuth("user", password);
-        tokenUtils.makeToken(username, jwtResponse.getToken());
-
-        this.mockMvc.perform(post("/api/auth/users/addUser")
-                .header("Authorization", "Bearer " + jwtResponse.getToken())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"userName\": \"admin2\", \"email\": \"admin2@admin2.com\", \"password\": \"12345\", \"role\": [\"admin\"] }"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("message").value("User registered successfully!"));
-    }
-
-//    @Test
 //    @DisplayName("Проверяет изменение своих данных пользователем с правами ADMIN.")
 //    public void testChangeMyAdminData() throws Exception{
 //        String id = "1";
@@ -376,22 +278,22 @@ public class UserTest {
         //.andExpect(jsonPath("message").value("You can edit only yourself data."));
     }
 
-//    @Test
-//    @DisplayName("Проверяет удаление пользователя автором с ролью ADMIN.")
-//    public void testDeleteUserByAdmin() throws Exception{
-//        String id = "2";
-//        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-//        tokenUtils.makeToken(username, jwtResponse.getToken());
-//
-//        this.mockMvc.perform(delete("/api/auth/users/" + id)
-//                .header("Authorization", "Bearer " + jwtResponse.getToken()))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("message").value("User was deleted successfully!"));
-//    }
+    @Test
+    @DisplayName("Проверяет удаление пользователя автором с ролью ADMIN.")
+    public void testDeleteUserByAdmin() throws Exception{
+        String id = "2";
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(delete("/api/auth/users/" + id)
+                .header("Authorization", "Bearer " + jwtResponse.getToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("User was deleted successfully!"));
+    }
 
     @Test
     @DisplayName("Проверяет удаление пользователя автором с ролью USER.")
-    public void testDeleteUserByUser() throws Exception{
+    public void testFailDeleteUserByUser() throws Exception{
         String id = "1";
         JwtResponse jwtResponse = tokenUtils.makeAuth("user", password);
         tokenUtils.makeToken(username, jwtResponse.getToken());
@@ -401,64 +303,66 @@ public class UserTest {
                 .andExpect(status().is(403));
     }
 
-//    @Test
-//    @DisplayName("Проверяет отображение списка всех пользователей.")
-//    public void testShowAllUsers() throws Exception{
-//        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-//        tokenUtils.makeToken(username, jwtResponse.getToken());
-//        Date date = new Date();
-//        String resp = "[{\"balances\":[],\"roles\":[{\"id\":1,\"roleName\":\"ROLE_ADMIN\"},{\"id\":2,\"roleName\":\"ROLE_USER\"}],\"userEmail\":\"admin@admin.com\",\"id\":1,\"creationDate\":\"" + date + "\",\"userName\":\"admin\"},{\"balances\":[],\"roles\":[{\"id\":2,\"roleName\":\"ROLE_USER\"}],\"userEmail\":\"user@user.com\",\"id\":2,\"creationDate\":\"" + date + "\",\"userName\":\"user\"}]";
-//
-//        this.mockMvc.perform(get("/api/auth/users/")
-//                .header("Authorization", "Bearer " + jwtResponse.getToken()))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
-//                .andReturn().getResponse().getContentAsString().equals(resp);
-//    }
+    @Test
+    @DisplayName("Проверяет отображение списка всех пользователей.")
+    public void testShowAllUsers() throws Exception{
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+        Date date = new Date();
+        String resp = "[{\"roles\":[{\"id\":1,\"mainRoleName\":\"ROLE_ADMINISTRATOR\"},{\"id\":2,\"mainRoleName\":\"ROLE_MODERATOR\"},{\"id\":3,\"mainRoleName\":\"ROLE_USER\"}],\"userEmail\":\"admin@admin.com\",\"id\":1,\"creationDate\":\"" + date + "\",\"userName\":\"admin\"},{\"roles\":[{\"id\":2,\"mainRoleName\":\"ROLE_MODERATOR\"},{\"id\":3,\"mainRoleName\":\"ROLE_USER\"}],\"userEmail\":\"mod@mod.com\",\"id\":2,\"creationDate\":\"" + date + "\",\"userName\":\"mod\"},{\"roles\":[{\"id\":3,\"mainRoleName\":\"ROLE_USER\"}],\"userEmail\":\"user@user.com\",\"id\":3,\"creationDate\":\"" + date + "\",\"userName\":\"user\"}]";
 
-//    @Test
-//    @DisplayName("Проверяет отображение информации о текущем пользователе.")
-//    public void testShowCurrentUserInfo() throws Exception{
-//        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-//        tokenUtils.makeToken(username, jwtResponse.getToken());
-//
-//        this.mockMvc.perform(get("/api/auth/users/getUserInfo")
-//                .header("Authorization", "Bearer " + jwtResponse.getToken()))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("userName").value("admin"))
-//                .andExpect(jsonPath("userEmail").value("admin@admin.com"))
-//                .andExpect((jsonPath("balances", Matchers.empty())));
-//    }
+        this.mockMvc.perform(get("/api/auth/users/")
+                .header("Authorization", "Bearer " + jwtResponse.getToken()))
+                .andExpect(status().is(200))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andReturn().getResponse().getContentAsString().equals(resp);
+    }
 
-//    @Test
-//    @DisplayName("Проверяет срок действия токенов на валидном токене.")
-//    public void testTokensDataCheck() throws Exception{
-//        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-//        tokenUtils.makeToken(username, jwtResponse.getToken());
-//
-//        this.mockMvc.perform(delete("/api/auth/users/tokens")
-//                .header("Authorization", "Bearer " + jwtResponse.getToken()))
-//                .andExpect(status().is4xxClientError())
-//                .andExpect(jsonPath("message").value("All tokens have valid expiry date!"));
-//    }
+    @Test
+    @DisplayName("Проверяет отображение информации о текущем пользователе.")
+    public void testShowCurrentUserInfo() throws Exception{
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
 
-//    @Test
-//    @DisplayName("Проверяет срок действия токенов и очистку базу токенов.")
-//    public void testTokensDataClean() throws Exception{
-//        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-//        tokenUtils.makeToken(username, jwtResponse.getToken());
-//
-//        // Create old token
-//        Assert.assertEquals(1, tokenRepository.findAll().size());
-//        tokenUtils.makeOldToken(username, password);
-//        Assert.assertEquals(2, tokenRepository.findAll().size());
-//
-//        this.mockMvc.perform(delete("/api/auth/users/tokens")
-//                .header("Authorization", "Bearer " + jwtResponse.getToken()))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("message").value("Tokens with expiry date was deleted successfully!"));
-//
-//        Assert.assertEquals(1, tokenRepository.findAll().size());
-//    }
+        this.mockMvc.perform(get("/api/auth/users/getUserInfo")
+                .header("Authorization", "Bearer " + jwtResponse.getToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("userName").value("admin"))
+                .andExpect(jsonPath("userEmail").value("admin@admin.com"))
+                .andExpect(jsonPath("userLocale").isEmpty())
+                .andExpect(jsonPath("activationEmailStatus").value(true))
+                .andExpect((jsonPath("userStatus", Matchers.empty())));
+    }
+
+    @Test
+    @DisplayName("Проверяет срок действия токенов на валидном токене.")
+    public void testTokensDataCheck() throws Exception{
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(delete("/api/auth/users/tokens")
+                .header("Authorization", "Bearer " + jwtResponse.getToken()))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("message").value("All tokens have valid expiry date!"));
+    }
+
+    @Test
+    @DisplayName("Проверяет срок действия токенов и очистку базу токенов.")
+    public void testTokensDataClean() throws Exception{
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        // Create old token
+        Assert.assertEquals(1, tokenRepository.findAll().size());
+        tokenUtils.makeOldToken(username, password);
+        Assert.assertEquals(2, tokenRepository.findAll().size());
+
+        this.mockMvc.perform(delete("/api/auth/users/tokens")
+                .header("Authorization", "Bearer " + jwtResponse.getToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("Tokens with expiry date was deleted successfully!"));
+
+        Assert.assertEquals(1, tokenRepository.findAll().size());
+    }
 
 }

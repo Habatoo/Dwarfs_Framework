@@ -47,13 +47,6 @@ public class SubRole {
     @Column(length = 20)
     private ESubRole subRoleName;
 
-    @JsonIdentityInfo(
-            generator = ObjectIdGenerators.PropertyGenerator.class,
-            property = "id")
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User userSubRoles;
-
     public SubRole(ESubRole subRoleName) {
         this.subRoleName = subRoleName;
     }

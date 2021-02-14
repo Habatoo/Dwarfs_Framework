@@ -47,13 +47,6 @@ public class MainRole {
     @Column(length = 20)
     private EMainRole mainRoleName;
 
-    @JsonIdentityInfo(
-            generator = ObjectIdGenerators.PropertyGenerator.class,
-            property = "id")
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User userMainRoles;
-
     public MainRole(EMainRole mainRoleName) {
         this.mainRoleName = mainRoleName;
     }

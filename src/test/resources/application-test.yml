@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: 1234567890
+    url: jdbc:postgresql://localhost:5432/dfdatabasetest
+    platform: postgres
+    initialization-mode: always
+    continue-on-error: true
+  jpa:
+    show-sql: false
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    database: postgresql
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 235455713239-gsfitturkangkseqjpfg5cese4atlket.apps.googleusercontent.com
+            client-secret: ${clientGoogleSecret}
+          facebook:
+            client-id: 779511356240542
+            client-secret: ${clientFacebookSecret}
+
+dwarfsframework:
+  app:
+    jwtSecret: 1234567890
+    jwtExpirationMs: 172800000
+    secretKey: 1234567890
+    remoteAddr: 0:0:0:0:0:0:0:1

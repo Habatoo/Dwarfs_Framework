@@ -16,14 +16,14 @@
 
 package com.angrydwarfs.framework.repository;
 
-import com.angrydwarfs.framework.models.Enums.ESubRole;
-import com.angrydwarfs.framework.models.SubRole;
+import com.angrydwarfs.framework.models.Enums.EStatus;
+import com.angrydwarfs.framework.models.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface SubRoleRepository extends JpaRepository<SubRole, Long> {
-    Optional<SubRole> findBySubRoleName(ESubRole subRoleName);
+public interface StatusRepository extends JpaRepository<Status, Long>{
+    Optional<Status> findByUserStatus(EStatus userStatus);
 }

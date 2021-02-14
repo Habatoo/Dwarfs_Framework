@@ -20,12 +20,14 @@ import com.angrydwarfs.framework.models.Enums.EMainRole;
 import com.angrydwarfs.framework.models.MainRole;
 import com.angrydwarfs.framework.models.Token;
 import com.angrydwarfs.framework.models.User;
+import com.angrydwarfs.framework.models.Views;
 import com.angrydwarfs.framework.payload.request.SignupRequest;
 import com.angrydwarfs.framework.payload.response.MessageResponse;
 import com.angrydwarfs.framework.repository.MainRoleRepository;
 import com.angrydwarfs.framework.repository.TokenRepository;
 import com.angrydwarfs.framework.repository.UserRepository;
 import com.angrydwarfs.framework.security.jwt.UserUtils;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -78,14 +80,14 @@ public class UserController {
      * @see com.angrydwarfs.framework.models.MainRole
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR')")
     @ResponseBody
     public ResponseEntity<?> userList() {
         List<Object> usersReturn = new ArrayList<>();
         List<User> usersCurrent = userRepository.findAll();
         for(User user: usersCurrent) {
             Map<String, Object> temp = new HashMap<String, Object>();
-            //temp.put("roles", user.getRoles());
+            temp.put("roles", user.getMainRoles());
             temp.put("creationDate", user.getCreationDate());
             temp.put("userEmail", user.getUserEmail());
             temp.put("userName", user.getUserName());
@@ -100,97 +102,20 @@ public class UserController {
      * @method getUserInfo - при http GET запросе по адресу .../api/auth/users/getUserInfo
      * @param authentication - данные по текущему аутентифицированному пользователю
      * возвращает данные
-     * @return {@code userRepository} - полные данные пользователя - user.userName, user.balance, user.roles
+     * @return {@code userRepository} - полные данные пользователя - user.userName, user.userEmail, user.roles
      * @see UserRepository
      */
-//    @GetMapping("/getUserInfo")
-//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-//    @ResponseBody
-//    public ResponseEntity<?>  getUserInfo(Authentication authentication) {
-//        User user = userRepository.findByUserName(authentication.getName()).get();
-//        return ResponseEntity.ok(
-//                user.getUserName(),
-//                user.getUserEmail(),
-//                user.getCreationDate()
-//        );
-//    }
-
-    /**
-     * @method registerUser - при http POST запросе по адресу .../api/auth/users/addUser
-     * @param signUpRequest - входные данные по текущему аутентифицированному пользователю
-     * возвращает данные
-     * @return {@code ResponseEntity.ok - User registered successfully!} - ок при успешной регистрации.
-     * @return {@code ResponseEntity.badRequest - Error: Role is not found.} - ошибка при указании неправильной роли.
-     * @return {@code ResponseEntity.badRequest - Error: Username is already taken!} - ошибка при дублировании username при регистрации.
-     * @return {@code ResponseEntity.badRequest - Error: Email is already in use!} - ошибка при дублировании email при регистрации.
-     * @see ResponseEntity
-     * @see SignupRequest
-     * метод доступен только для пользователей с ролью ADMIN
-     */
-    @PostMapping("/addUser")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest, HttpServletRequest request) {
-        if (!(remoteAddr.equals(request.getRemoteAddr()) || "127.0.0.1".equals(request.getRemoteAddr()) | "localhost".equals(request.getRemoteAddr()))) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Not support IP!"));
+    @GetMapping("/getUserInfo")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR')")
+    @ResponseBody
+    public ResponseEntity<?>  getUserInfo(Authentication authentication) {
+        Optional optionalUser = userRepository.findByUserName(authentication.getName());
+        if(optionalUser.isPresent()) {
+            return ResponseEntity.ok(optionalUser.get());
         }
-
-        if (userRepository.existsByUserName(
-                signUpRequest.getUserName()
-        )) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
-        }
-
-        if (userRepository.existsByUserEmail(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
-        }
-
-        // Create new user's account
-        User user = new User(
-                signUpRequest.getUserName(),
-                signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword())
-        );
-
-        Set<String> strRoles = signUpRequest.getRole();
-        Set<MainRole> roles = new HashSet<>();
-
-        if (strRoles == null) {
-            MainRole userRole = roleRepository.findByMainRoleName(EMainRole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        MainRole adminRole = roleRepository.findByMainRoleName(EMainRole.ROLE_ADMINISTRATOR)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
-                        break;
-
-                    case "mod":
-                        MainRole modRole = roleRepository.findByMainRoleName(EMainRole.ROLE_MODERATOR)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(modRole);
-                        break;
-
-                    default:
-                        MainRole userRole = roleRepository.findByMainRoleName(EMainRole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                }
-            });
-        }
-
-        user.setMainRoles(roles);
-        user.setCreationDate(LocalDateTime.now());
-        userRepository.save(user);
-
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return ResponseEntity
+                .badRequest()
+                .body(new MessageResponse("Error: can not find user data."));
     }
 
     /**
@@ -203,7 +128,7 @@ public class UserController {
      * @see UserRepository
      */
     @PutMapping("{id}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR') or hasRole('ROLE_USER')")
     public ResponseEntity<?> changeUser(
             @PathVariable("id") User userFromDb,
             @RequestBody User user,
@@ -234,7 +159,7 @@ public class UserController {
      * @see UserRepository
      */
     @DeleteMapping("{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR')")
     public ResponseEntity<?>  deleteUser(@PathVariable("id") User user) {
         try {
             userRepository.delete(user);
@@ -253,7 +178,7 @@ public class UserController {
      * @return {@code ResponseEntity.ok - Tokens with expiry date was deleted successfully!} - при успешном удалении токенов с истекшим сроком действия.
      */
     @DeleteMapping("/tokens")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
     public ResponseEntity<?>  clearTokens() {
 
         try {

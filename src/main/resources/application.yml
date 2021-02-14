@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: dfuser
+    password: ${dbSecret}
+    url: jdbc:postgresql://localhost:5432/dfdatabase
+    platform: postgres
+    initialization-mode: always
+    continue-on-error: true
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    database: postgresql
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 235455713239-gsfitturkangkseqjpfg5cese4atlket.apps.googleusercontent.com
+            client-secret: ${clientGoogleSecret}
+          facebook:
+            client-id: 779511356240542
+            client-secret: ${clientFacebookSecret}
+
+dwarfsframework:
+    app:
+      jwtSecret: ${dbSecret}
+      jwtExpirationMs: 172800000
+      secretKey: ${secretKey}
+      remoteAddr: ${remoteAddr}
