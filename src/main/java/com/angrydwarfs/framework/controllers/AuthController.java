@@ -26,6 +26,7 @@ import com.angrydwarfs.framework.payload.response.JwtResponse;
 import com.angrydwarfs.framework.payload.response.MessageResponse;
 import com.angrydwarfs.framework.repository.*;
 import com.angrydwarfs.framework.security.jwt.TokenUtils;
+import com.angrydwarfs.framework.security.jwt.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -69,6 +70,9 @@ public class AuthController {
 
     @Autowired
     PasswordEncoder encoder;
+
+    @Autowired
+    UserUtils userUtils;
 
     @Value("${dwarfsframework.app.secretKey}")
     private String secretKey;
@@ -148,11 +152,11 @@ public class AuthController {
         user.setSubRoles(subRoleSet);
         user.setCreationDate(LocalDateTime.now());
 
-//        Set<Status> statusSet = new HashSet<>();
-//        statusSet.add(statusRepository.findByUserStatus(EStatus.COMMON).get());
-//        user.setUserStatus(statusSet);
-//        user.setStatusStartDate(LocalDateTime.now());
-        //user.setStatusEndDate(null);
+        Set<Status> statusSet = new HashSet<>();
+        statusSet.add(statusRepository.findByUserStatus(EStatus.COMMON).get());
+        user.setUserStatus(statusSet);
+        user.setStatusStartDate(LocalDateTime.now());
+        user.setStatusEndDate(null);
 
         userRepository.save(user);
 

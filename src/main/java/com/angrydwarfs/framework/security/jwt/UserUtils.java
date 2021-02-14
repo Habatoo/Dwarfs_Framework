@@ -65,4 +65,33 @@ public class UserUtils {
         return ResponseEntity.ok(new MessageResponse("User data was update successfully!"));
 
     }
+
+
+    //TODO сделать универсальный метод проверки уникальности
+    /**
+     * Проверяет username и email на уникальность и отсуствие аналогов в существующей базе
+     * @param user - данные пользователя для изменений
+     */
+    public ResponseEntity<?>  checkRegisterUserNameAndEmail(User user) {
+
+        if (userRepository.existsByUserName(
+                user.getUserName()
+        )) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Username is already taken!"));
+        }
+
+        if (userRepository.existsByUserEmail(user.getUserEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Email is already in use!"));
+        }
+
+        return ResponseEntity
+                .ok()
+                .body(new MessageResponse("OK"));
+    }
+
+
 }
