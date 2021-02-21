@@ -49,24 +49,35 @@ public class Activity {
     @NotBlank(message = "ActivityIndex cannot be empty")
     private String activityIndex = UUID.randomUUID().toString();
 
+    @JsonView(Views.UserShortData.class)
     @NotBlank(message = "Title cannot be empty")
     private String activityTitle;
+    @JsonView(Views.UserShortData.class)
     @NotBlank(message = "Body cannot be empty")
     private String activityBody;
 
     @Column(updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonView(Views.UserShortData.class)
     private LocalDateTime creationDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonView(Views.UserShortData.class)
     private User userActivities;
 
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,
             property = "id")
-    @OneToMany(mappedBy = "userTags", fetch = FetchType.LAZY, orphanRemoval = true)
-    //@JsonView(Views.ShortData.class)
+    @OneToMany(mappedBy = "userTags", fetch = FetchType.EAGER, orphanRemoval = true)
+    @JsonView(Views.UserShortData.class)
     private Set<Tag> tags;
+
+    public Activity(String activityTitle, String activityBody, User user) {
+        this.activityTitle = activityTitle;
+        this.activityBody = activityBody;
+        this.creationDate = LocalDateTime.now();
+        this.userActivities = user;
+    }
 
 }

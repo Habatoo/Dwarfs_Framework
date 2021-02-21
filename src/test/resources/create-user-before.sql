@@ -10,6 +10,8 @@ DELETE FROM tokens;
 
 DELETE FROM usr;
 
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 INSERT INTO main_roles(id, main_role_name) VALUES
 (1, 'ROLE_ADMINISTRATOR'), (2, 'ROLE_MODERATOR'), (3, 'ROLE_USER');
 
@@ -33,6 +35,12 @@ INSERT INTO usr(id, user_name, user_email, password, creation_date, activation_e
 
 INSERT INTO user_main_roles VALUES
 (1, 1), (1, 2), (1, 3), (2, 2), (2, 3), (3, 3);
+
+INSERT INTO activity(id, activity_title, activity_index, activity_body, creation_date, user_id) VALUES
+(1, 'First activity', uuid_generate_v4(), 'First user body activity FIRST', current_date, 1),
+(2, 'Second activity', uuid_generate_v4(), 'First user body activity SECOND', current_date, 1),
+(3, 'Third activity', uuid_generate_v4(), 'Second user body activity THIRD', current_date, 2),
+(4, 'Fourth activity', uuid_generate_v4(), 'Third user body activity FOURTH', current_date, 3);
 
 
 alter sequence usr_id_seq restart with 10;

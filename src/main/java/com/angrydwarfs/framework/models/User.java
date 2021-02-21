@@ -133,7 +133,7 @@ public class User implements Serializable {
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,
             property = "id")
-    @OneToMany(mappedBy = "userActivities", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "userActivities", fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<Activity> activities;
 
     @JsonIdentityInfo(
