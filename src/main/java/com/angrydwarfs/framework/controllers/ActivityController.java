@@ -16,15 +16,18 @@
 
 package com.angrydwarfs.framework.controllers;
 
-import com.angrydwarfs.framework.models.User;
-import com.angrydwarfs.framework.models.Views;
+import com.angrydwarfs.framework.models.*;
+import com.angrydwarfs.framework.models.Enums.EMainRole;
+import com.angrydwarfs.framework.models.Enums.EStatus;
+import com.angrydwarfs.framework.models.Enums.ESubRole;
+import com.angrydwarfs.framework.models.Enums.ETag;
+import com.angrydwarfs.framework.payload.request.ActivityRequest;
+import com.angrydwarfs.framework.payload.request.SignupRequest;
 import com.angrydwarfs.framework.payload.response.MessageResponse;
-import com.angrydwarfs.framework.repository.ActivityRepository;
-import com.angrydwarfs.framework.repository.MainRoleRepository;
-import com.angrydwarfs.framework.repository.TokenRepository;
-import com.angrydwarfs.framework.repository.UserRepository;
+import com.angrydwarfs.framework.repository.*;
 import com.angrydwarfs.framework.security.jwt.UserUtils;
 import com.fasterxml.jackson.annotation.JsonView;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +36,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -66,6 +72,9 @@ public class ActivityController {
     MainRoleRepository roleRepository;
 
     @Autowired
+    TagRepository tagRepository;
+
+    @Autowired
     PasswordEncoder encoder;
 
     @Autowired
@@ -77,7 +86,6 @@ public class ActivityController {
      * @see User
      */
     @GetMapping
-    //@PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR')")
     @ResponseBody
     @JsonView(Views.UserShortData.class)
     public ResponseEntity<?> userActivityList(Authentication authentication) {
@@ -90,5 +98,122 @@ public class ActivityController {
         }
 
         return ResponseEntity.ok(activityRepository.findByUserActivities(userRepository.findByUserName(authentication.getName()).get()));
+    }
+
+    /**
+     * Выбор activity по его id при GET запросе по адресу .../api/auth/users/activities/id
+     * @param activity
+     * @return
+     */
+    @GetMapping("{id}")
+    @ResponseBody
+    @JsonView(Views.UserShortData.class)
+    public ResponseEntity<?> userOneActivity(@PathVariable("id") Activity activity) {
+        return ResponseEntity.ok(activityRepository.findById(activity.getId()));
+    }
+
+    //TODO доделать добавление тэгов
+    /**
+     * Создание activity при POST запросе по адресу .../api/auth/users/activities/newActivity
+     * @param activityRequest
+     * @param authentication
+     * @return
+     */
+    @PostMapping("/newActivity")
+    public ResponseEntity<?> createNewActivity(
+            @Valid @RequestBody ActivityRequest activityRequest,
+            Authentication authentication,
+            HttpServletRequest request) {
+
+        User user = userRepository.findByUserName(authentication.getName()).get();
+        Activity activity = new Activity(activityRequest.getActivityTitle(), activityRequest.getActivityBody(), user);
+        activity.setCreationDate(activityRequest.getCreationDate());
+
+//        Set<Tag> tags = new HashSet<>();
+//        for(String tag: activityRequest.getTag()) {
+//            System.out.println("Tags " + tag);
+//            //tags.add(tagRepository.findByTagName(tag).orElse(new Tag()));
+//        }
+//        activity.setTags(tags);
+        activityRepository.save(activity);
+
+        return ResponseEntity.ok(new MessageResponse("Activity create successfully!"));
+    }
+
+    //TODO рефакторить повторение редактирования
+    /**
+     * Редактирование activity, доступно только автору activity и пользователям с ролью MOD, ADMIN
+     * @param activityFromDb
+     * @param activity
+     * @param authentication
+     * @return
+     */
+    @PutMapping("{id}")
+    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> changeActivity(
+            @PathVariable("id") Activity activityFromDb,
+            @RequestBody Activity activity,
+            Authentication authentication) {
+
+        activityFromDb = activityRepository.findById(activityFromDb.getId()).get();
+        // check ID current user = ID edit user
+        if(!(authentication.getName().equals(activityFromDb.getUserActivities().getUserName()))) {
+            // admin check
+            if(userRepository.findByUserName(authentication.getName()).get().getMainRoles().size() >= 3) {
+                //BeanUtils.copyProperties(activity, activityFromDb, "id");
+                activityFromDb.setActivityTitle(activity.getActivityTitle());
+                activityFromDb.setActivityBody(activity.getActivityBody());
+                activityRepository.save(activityFromDb);
+                return ResponseEntity.ok(new MessageResponse("Activity was update successfully!"));
+            }
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("You can edit only yourself data!"));
+        } else {
+            //BeanUtils.copyProperties(activity, activityFromDb, "id");
+            activityFromDb.setActivityTitle(activity.getActivityTitle());
+            activityFromDb.setActivityBody(activity.getActivityBody());
+            activityRepository.save(activityFromDb);
+            return ResponseEntity.ok(new MessageResponse("Activity was update successfully!"));
+        }
+
+    }
+
+    //TODO рефакторить повторение удаления
+    /**
+     * Удаление activity пользователя, доступно только автору activity и пользователям с ролью MOD, ADMIN
+     * @param activity
+     * @return
+     */
+    @DeleteMapping("{id}")
+    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR') or hasRole('ROLE_USER')")
+    public ResponseEntity<?>  deleteUser(@PathVariable("id") Activity activity, Authentication authentication) {
+
+        // check ID current user = ID edit user
+        if(!(authentication.getName().equals(activity.getUserActivities().getUserName()))) {
+            // admin check
+            if(userRepository.findByUserName(authentication.getName()).get().getMainRoles().size() >= 3) {
+                try {
+                    activityRepository.delete(activity);
+                    return ResponseEntity.ok(new MessageResponse("Activity was deleted successfully!"));
+                } catch (Exception e) {
+                    return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: Activity was not deleted!"));
+                }
+            }
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("You can delete only yourself data!"));
+        } else {
+            try {
+                activityRepository.delete(activity);
+                return ResponseEntity.ok(new MessageResponse("Activity was deleted successfully!"));
+            } catch (Exception e) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(new MessageResponse("Error: Activity was not deleted!"));
+            }
+        }
     }
 }

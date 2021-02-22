@@ -214,54 +214,53 @@ public class UserTest {
         Assert.assertTrue(user.getTags().toString().contains("THIRD_LEVEL"));
     }
 
-//    @Test
-//    @DisplayName("Проверяет изменение своих данных пользователем с правами ADMIN.")
-//    public void testChangeMyAdminData() throws Exception{
-//        String id = "1";
-//        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-//        tokenUtils.makeToken(username, jwtResponse.getAccessToken());
-//
-//        //System.out.println("MyAdminData " + userRepository.findByUserName(username));
-//
-//        this.mockMvc.perform(put("/api/auth/users/" + id)
-//                .header("Authorization", "Bearer " + jwtResponse.getAccessToken())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content("{ \"userName\": \"admin2\", \"userEmail\": \"admin2@admin2.com\", \"password\": \"12345\"] }"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("message").value("ser data was update successfully!"));
-//
-//    }
+    @Test
+    @DisplayName("Проверяет изменение своих данных пользователем с правами ADMIN.")
+    public void testChangeMyAdminData() throws Exception{
+        String id = "1";
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
 
-//    @Test
-//    @DisplayName("Проверяет изменение не своих данных пользователем с правами ADMIN.")
-//    public void testChangeUserData() throws Exception{
-//        String id = "2";
-//        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-//        tokenUtils.makeToken(username, jwtResponse.getAccessToken());
-//
-//        this.mockMvc.perform(put("/api/auth/users/" + id)
-//                .header("Authorization", "Bearer " + jwtResponse.getAccessToken())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content("{ \"userName\": \"user2\", \"userEmail\": \"user2@user2.com\", \"password\": \"12345\"] }"))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("message").value("User data was update successfully!"));
-//    }
+        //System.out.println("MyAdminData " + userRepository.findByUserName(username));
 
-//    @Test
-//    @DisplayName("Проверяет изменение своих данных пользователем с правами USER.")
-//    public void testChangeMyUserData() throws Exception{
-//        JwtResponse jwtResponse = tokenUtils.makeAuth("user", password);
-//        tokenUtils.makeToken(username, jwtResponse.getAccessToken());
-//
-//        this.mockMvc.perform(put("/api/auth/users/2")
-//                .header("Authorization", "Bearer " + jwtResponse.getAccessToken())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content("{ \"userName\": \"user2\", \"userEmail\": \"user2@user2.com\", \"password\": \"12345\"] }"))
-//                .andExpect(status().is(200))
-//                .andExpect(jsonPath("message").value("User data was update successfully!"));
-//
-//    }
+        this.mockMvc.perform(put("/api/auth/users/" + id)
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"userName\": \"admin2\", \"userEmail\": \"admin2@admin2.com\", \"password\": \"12345\" }"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("User data was update successfully!"));
+
+    }
+
+    @Test
+    @DisplayName("Проверяет изменение не своих данных пользователем с правами ADMIN.")
+    public void testChangeUserData() throws Exception{
+        String id = "2";
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(put("/api/auth/users/" + id)
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"userName\": \"user2\", \"userEmail\": \"user2@user2.com\", \"password\": \"12345\" }"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("User data was update successfully!"));
+    }
+
+    @Test
+    @DisplayName("Проверяет изменение своих данных пользователем с правами USER.")
+    public void testChangeMyUserData() throws Exception{
+        JwtResponse jwtResponse = tokenUtils.makeAuth("user", password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(put("/api/auth/users/3")
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"userName\": \"user2\", \"userEmail\": \"user2@user2.com\", \"password\": \"12345\" }"))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("message").value("User data was update successfully!"));
+
+    }
 
     @Test
     @DisplayName("Проверяет изменение не своих данных пользователем с правами USER.")

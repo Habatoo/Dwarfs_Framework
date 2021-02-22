@@ -53,7 +53,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -107,7 +107,7 @@ public class ActivityTest {
     @Test
     @DisplayName("Проверяет отображение всех сообщений пользователем ADMIN.")
     public void showAllActivitiesFromDb() {
-        User user = commonUser();
+        User user = commonUser(username);
         List<Activity> activityList = activityRepository.findByUserActivities(user);
         System.out.println("ActivityTest.createNewActivity " + activityRepository.findByUserActivities(user));
 
@@ -126,7 +126,7 @@ public class ActivityTest {
 
     @Test
     @DisplayName("Проверяет отображение всех сообщений пользователя ADMIN.")
-    public void showAllActivities() throws Exception{
+    public void showAllAdminActivities() throws Exception{
         JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
         tokenUtils.makeToken(username, jwtResponse.getToken());
         LocalDate localDate = LocalDate.now();
@@ -141,9 +141,25 @@ public class ActivityTest {
     }
 
     @Test
+    @DisplayName("Проверяет отображение всех сообщений пользователя USER.")
+    public void showAllUserActivities() throws Exception{
+        JwtResponse jwtResponse = tokenUtils.makeAuth("user", password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+        LocalDate localDate = LocalDate.now();
+        String date = localDate + " 00:00:00";
+
+        this.mockMvc.perform(get("/api/auth/users/activities")
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().string("[{\"activityTitle\":\"Fourth activity\",\"activityBody\":\"Third user body activity FOURTH\",\"creationDate\":\"" + date + "\",\"userActivities\":{\"userName\":\"user\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]}]"));
+    }
+
+    @Test
     @DisplayName("Проверяет создание нового activity пользователем ADMIN.")
-    public void createNewActivity() {
-        User user = commonUser();
+    public void createAdminNewActivity() {
+        User user = commonUser(username);
         Set<Tag> tags = createTags();
         Activity activity = new Activity("Test title", "Body message of test activity", user);
         activity.setTags(tags);
@@ -161,23 +177,201 @@ public class ActivityTest {
         Assert.assertTrue(activity.getTags().toString().contains("CROSSFIT"));
     }
 
-    //    @Test
-//    @DisplayName("Проверяет изменение не своих данных пользователем с правами ADMIN.")
-//    public void testChangeUserData() throws Exception{
-//        String id = "2";
-//        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
-//        tokenUtils.makeToken(username, jwtResponse.getAccessToken());
-//
-//        this.mockMvc.perform(put("/api/auth/users/" + id)
-//                .header("Authorization", "Bearer " + jwtResponse.getAccessToken())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content("{ \"userName\": \"user2\", \"userEmail\": \"user2@user2.com\", \"password\": \"12345\"] }"))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("message").value("User data was update successfully!"));
-//    }
+    @Test
+    @DisplayName("Проверяет создание нового activity пользователем USER.")
+    public void createUserNewActivity() {
+        User user = commonUser("user");
+        Set<Tag> tags = createTags();
+        Activity activity = new Activity("Test user title", "Body user message of test activity", user);
+        activity.setTags(tags);
+        activity.setId(new Long(4));
+        activityRepository.save(activity);
 
-    private User commonUser() {
+        assertEquals("Test user title", activity.getActivityTitle());
+        assertEquals("Body user message of test activity", activity.getActivityBody());
+        assertEquals(LocalDateTime.now().getYear(), activity.getCreationDate().getYear());
+        assertEquals(LocalDateTime.now().getMonth(), activity.getCreationDate().getMonth());
+        assertEquals(LocalDateTime.now().getDayOfMonth(), activity.getCreationDate().getDayOfMonth());
+
+        Assert.assertTrue(activity.getTags().toString().contains("JOGGING"));
+        Assert.assertTrue(activity.getTags().toString().contains("FITNESS"));
+        Assert.assertTrue(activity.getTags().toString().contains("CROSSFIT"));
+    }
+
+    @Test
+    @DisplayName("Проверяет создание нового activity пользователем ADMIN.")
+    public void createAdminNewActivityAPI() throws Exception{
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+        LocalDate localDate = LocalDate.now();
+        String date = localDate + " 00:00:00";
+
+        this.mockMvc.perform(post("/api/auth/users/activities/newActivity")
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"activityTitle\": \"Test activity\", \"activityBody\": \"Test activity body\", \"creationDate\": \"2021-02-22 00:00:00\", \"tags\": [\"JOGGING\", \"FITNESS\"] }"))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Activity activity = activityRepository.findById(new Long(10)).get();
+        assertEquals("Test activity", activity.getActivityTitle());
+        assertEquals("Test activity body", activity.getActivityBody());
+        assertEquals(2021, activity.getCreationDate().getYear());
+        assertEquals(java.time.Month.FEBRUARY, activity.getCreationDate().getMonth());
+        assertEquals(22, activity.getCreationDate().getDayOfMonth());
+
+//        Assert.assertTrue(activity.getTags().toString().contains("JOGGING"));
+//        Assert.assertTrue(activity.getTags().toString().contains("FITNESS"));
+//        Assert.assertFalse(activity.getTags().toString().contains("CROSSFIT"));
+    }
+
+    @Test
+    @DisplayName("Проверяет выбор activity по его id.")
+    public void testShowActivity() throws Exception{
+        String id = "3"; // Сообщение пользователя USER
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+        LocalDate localDate = LocalDate.now();
+        String date = localDate + " 00:00:00";
+
+        this.mockMvc.perform(get("/api/auth/users/activities/" + id)
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.activityTitle").value("Third activity"))
+                .andExpect(jsonPath("$.activityBody").value("Second user body activity THIRD"))
+                .andExpect(jsonPath("$.creationDate").value(date))
+                .andExpect(jsonPath("$.userActivities").isNotEmpty());
+    }
+
+    @Test
+    @DisplayName("Проверяет изменение своего activity пользователем с правами ADMIN.")
+    public void testChangeMyAdminActivity() throws Exception{
+        String id = "1"; // Сообщение пользователя ADMIN
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(put("/api/auth/users/activities/" + id)
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"activityTitle\": \"Third edit activity\", \"activityBody\": \"Second edit user body activity THIRD\" }"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("Activity was update successfully!"));
+
+        assertEquals("Third edit activity", activityRepository.findById(new Long(1)).get().getActivityTitle());
+        assertEquals("Second edit user body activity THIRD", activityRepository.findById(new Long(1)).get().getActivityBody());
+    }
+
+    @Test
+    @DisplayName("Проверяет изменение не своего activity пользователем с правами ADMIN.")
+    public void testChangeNotMyAdminActivity() throws Exception{
+        String id = "4"; // Сообщение пользователя USER
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(put("/api/auth/users/activities/" + id)
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"activityTitle\": \"Third edit activity\", \"activityBody\": \"Second edit user body activity THIRD\" }"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("Activity was update successfully!"));
+
+        assertEquals("Third edit activity", activityRepository.findById(new Long(4)).get().getActivityTitle());
+        assertEquals("Second edit user body activity THIRD", activityRepository.findById(new Long(4)).get().getActivityBody());
+    }
+
+    @Test
+    @DisplayName("Проверяет изменение своего activity пользователем с правами USER.")
+    public void testChangeMyUserActivity() throws Exception{
+        String id = "4"; // Сообщение пользователя USER
+        JwtResponse jwtResponse = tokenUtils.makeAuth("user", password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(put("/api/auth/users/activities/" + id)
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"activityTitle\": \"Third edit activity\", \"activityBody\": \"Second edit user body activity THIRD\" }"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("Activity was update successfully!"));
+
+        assertEquals("Third edit activity", activityRepository.findById(new Long(4)).get().getActivityTitle());
+        assertEquals("Second edit user body activity THIRD", activityRepository.findById(new Long(4)).get().getActivityBody());
+    }
+
+    @Test
+    @DisplayName("Проверяет изменение не своего activity пользователем с правами USER.")
+    public void testChangeNotMyUserActivity() throws Exception{
+        String id = "1"; // Сообщение пользователя ADMIN
+        JwtResponse jwtResponse = tokenUtils.makeAuth("user", password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(put("/api/auth/users/activities/" + id)
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"activityTitle\": \"Third edit activity\", \"activityBody\": \"Second edit user body activity THIRD\" }"))
+                .andDo(print())
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("message").value("You can edit only yourself data!"));
+
+    }
+
+    @Test
+    @DisplayName("Проверяет удаление своего activity автором ADMIN.")
+    public void testDeleteMyActivityByAdmin() throws Exception{
+        String id = "1";
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(delete("/api/auth/users/activities/" + id)
+                .header("Authorization", "Bearer " + jwtResponse.getToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("Activity was deleted successfully!"));
+    }
+
+    @Test
+    @DisplayName("Проверяет удаление не своего activity автором ADMIN.")
+    public void testDeleteNotMyActivityByAdmin() throws Exception{
+        String id = "3";
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(delete("/api/auth/users/activities/" + id)
+                .header("Authorization", "Bearer " + jwtResponse.getToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("Activity was deleted successfully!"));
+    }
+
+    @Test
+    @DisplayName("Проверяет удаление своего activity автором USER.")
+    public void testDeleteMyActivityByUser() throws Exception{
+        String id = "4";
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(delete("/api/auth/users/activities/" + id)
+                .header("Authorization", "Bearer " + jwtResponse.getToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("Activity was deleted successfully!"));
+    }
+
+    @Test
+    @DisplayName("Проверяет удаление не своего activity автором USER.")
+    public void testDeleteNotMyActivityByUser() throws Exception{
+        String id = "1";
+        JwtResponse jwtResponse = tokenUtils.makeAuth("user", password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(delete("/api/auth/users/activities/" + id)
+                .header("Authorization", "Bearer " + jwtResponse.getToken()))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("message").value("You can delete only yourself data!"));
+    }
+
+    private User commonUser(String username) {
         User user = userRepository.findByUserName(username).get();
         Set<Status> userStatus = new HashSet<>();
         userStatus.add(new Status(EStatus.COMMON));

@@ -44,3 +44,4 @@ INSERT INTO activity(id, activity_title, activity_index, activity_body, creation
 
 
 alter sequence usr_id_seq restart with 10;
+alter sequence activity_id_seq restart with 10;
