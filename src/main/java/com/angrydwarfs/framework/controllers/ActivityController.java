@@ -122,8 +122,7 @@ public class ActivityController {
     @PostMapping("/newActivity")
     public ResponseEntity<?> createNewActivity(
             @Valid @RequestBody ActivityRequest activityRequest,
-            Authentication authentication,
-            HttpServletRequest request) {
+            Authentication authentication) {
 
         User user = userRepository.findByUserName(authentication.getName()).get();
         Activity activity = new Activity(activityRequest.getActivityTitle(), activityRequest.getActivityBody(), user);
@@ -133,19 +132,20 @@ public class ActivityController {
         Set<Tag> tags = new HashSet<>();
         try {
             Set<String> strTags = activityRequest.getTags();
-
             if (strTags != null) {
                 for (String tag : strTags) {
                     tags.add(tagRepository.findByTagName(ETag.valueOf(tag)).get());
                 }
-                activity.setTags(tags);
             }
+            activity.setTags(tags);
         } catch (Exception e) {
             return ResponseEntity.ok(new MessageResponse("Tags is not exist!" + e));
         }
         //////////////////////////////////
         activityRepository.save(activity);
-
+//        System.out.println("Activity " + activityRepository.findById(new Long(10)).get().getTags().toString().contains("FITNESS"));
+//        System.out.println("Activity " + activityRepository.findById(new Long(10)).get().getTags().toString().contains("JOGGING"));
+//        System.out.println("Activity " + activityRepository.findById(new Long(10)).get().getTags().toString().contains("CROSSFIT"));
         return ResponseEntity.ok(new MessageResponse("Activity create successfully!"));
     }
 

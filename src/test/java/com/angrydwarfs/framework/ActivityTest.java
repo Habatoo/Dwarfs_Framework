@@ -220,6 +220,14 @@ public class ActivityTest {
         assertEquals(java.time.Month.FEBRUARY, activity.getCreationDate().getMonth());
         assertEquals(22, activity.getCreationDate().getDayOfMonth());
 
+//        System.out.println("tags " + activity.getTags());
+//        System.out.println("user " + activity.getUserActivities());
+//        System.out.println("uuid " + activity.getActivityIndex());
+//        System.out.println("id " + activity.getId());
+//        System.out.println("Activity " + activityRepository.findById(new Long(10)).get().getTags().toString().contains("FITNESS"));
+//        System.out.println("Activity " + activityRepository.findById(new Long(10)).get().getTags().toString().contains("JOGGING"));
+//        System.out.println("Activity " + activityRepository.findById(new Long(10)).get().getTags().toString().contains("CROSSFIT"));
+
 //        Assert.assertTrue(activityRepository.findById(new Long(10)).get().getTags().toString().contains("JOGGING"));
 //        Assert.assertTrue(activity.getTags().toString().contains("FITNESS"));
 //        Assert.assertFalse(activity.getTags().toString().contains("CROSSFIT"));

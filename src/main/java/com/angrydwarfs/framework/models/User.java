@@ -128,20 +128,20 @@ public class User implements Serializable {
             generator = ObjectIdGenerators.PropertyGenerator.class,
             property = "id")
     @OneToMany(mappedBy = "userTokens", fetch = FetchType.EAGER, orphanRemoval = true)
-    private Set<Token> tokens;
+    private Set<Token> tokens = new HashSet<>();
 
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,
             property = "id")
     @OneToMany(mappedBy = "userActivities", fetch = FetchType.EAGER, orphanRemoval = true)
-    private Set<Activity> activities;
+    private Set<Activity> activities = new HashSet<>();
 
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,
             property = "id")
-    @OneToMany(mappedBy = "userTags", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "userTags", fetch = FetchType.EAGER, orphanRemoval = true)
     //@JsonView(Views.ShortData.class)
-    private Set<Tag> tags;
+    private Set<Tag> tags = new HashSet<>();
 
     /**
      * Конструктор для создания пользователя.

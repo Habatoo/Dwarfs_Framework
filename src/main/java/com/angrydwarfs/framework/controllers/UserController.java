@@ -16,16 +16,14 @@
 
 package com.angrydwarfs.framework.controllers;
 
+import com.angrydwarfs.framework.models.*;
+import com.angrydwarfs.framework.models.Enums.ELevel;
 import com.angrydwarfs.framework.models.Enums.EMainRole;
-import com.angrydwarfs.framework.models.MainRole;
-import com.angrydwarfs.framework.models.Token;
-import com.angrydwarfs.framework.models.User;
-import com.angrydwarfs.framework.models.Views;
+import com.angrydwarfs.framework.models.Enums.ETag;
 import com.angrydwarfs.framework.payload.request.SignupRequest;
+import com.angrydwarfs.framework.payload.request.UserEditRequest;
 import com.angrydwarfs.framework.payload.response.MessageResponse;
-import com.angrydwarfs.framework.repository.MainRoleRepository;
-import com.angrydwarfs.framework.repository.TokenRepository;
-import com.angrydwarfs.framework.repository.UserRepository;
+import com.angrydwarfs.framework.repository.*;
 import com.angrydwarfs.framework.security.jwt.UserUtils;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +61,12 @@ public class UserController {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
     }
+
+    @Autowired
+    TagRepository tagRepository;
+
+    @Autowired
+    LevelRepository levelRepository;
 
     @Autowired
     MainRoleRepository roleRepository;

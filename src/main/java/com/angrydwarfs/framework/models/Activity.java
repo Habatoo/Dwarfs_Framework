@@ -25,6 +25,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -69,9 +70,9 @@ public class Activity {
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,
             property = "id")
-    @OneToMany(mappedBy = "userTags", fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "userTags", fetch = FetchType.EAGER)
     @JsonView(Views.UserShortData.class)
-    private Set<Tag> tags;
+    private Set<Tag> tags = new HashSet<>();
 
     public Activity(String activityTitle, String activityBody, User user) {
         this.activityTitle = activityTitle;
