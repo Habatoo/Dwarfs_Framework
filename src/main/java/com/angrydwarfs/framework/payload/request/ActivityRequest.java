@@ -45,6 +45,6 @@ public class ActivityRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime creationDate;
 
-    private Set<String> tag;
+    private Set<String> tags;
 
 }

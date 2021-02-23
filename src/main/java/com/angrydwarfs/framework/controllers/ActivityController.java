@@ -112,7 +112,7 @@ public class ActivityController {
         return ResponseEntity.ok(activityRepository.findById(activity.getId()));
     }
 
-    //TODO доделать добавление тэгов
+    //TODO доделать тест тэгов
     /**
      * Создание activity при POST запросе по адресу .../api/auth/users/activities/newActivity
      * @param activityRequest
@@ -129,12 +129,21 @@ public class ActivityController {
         Activity activity = new Activity(activityRequest.getActivityTitle(), activityRequest.getActivityBody(), user);
         activity.setCreationDate(activityRequest.getCreationDate());
 
-//        Set<Tag> tags = new HashSet<>();
-//        for(String tag: activityRequest.getTag()) {
-//            System.out.println("Tags " + tag);
-//            //tags.add(tagRepository.findByTagName(tag).orElse(new Tag()));
-//        }
-//        activity.setTags(tags);
+        ////////////////////////////////// tags
+        Set<Tag> tags = new HashSet<>();
+        try {
+            Set<String> strTags = activityRequest.getTags();
+
+            if (strTags != null) {
+                for (String tag : strTags) {
+                    tags.add(tagRepository.findByTagName(ETag.valueOf(tag)).get());
+                }
+                activity.setTags(tags);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.ok(new MessageResponse("Tags is not exist!" + e));
+        }
+        //////////////////////////////////
         activityRepository.save(activity);
 
         return ResponseEntity.ok(new MessageResponse("Activity create successfully!"));
