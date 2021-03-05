@@ -24,6 +24,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface LevelRepository extends JpaRepository<Level, Long> {
+public interface LevelRepository extends JpaRepository<Level, Integer> {
     Optional<Level> findByLevelName(ELevel levelName);
 }

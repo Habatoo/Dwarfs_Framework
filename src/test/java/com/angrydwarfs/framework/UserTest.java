@@ -193,13 +193,13 @@ public class UserTest {
         User user = userRepository.findByUserName(username).get();
         Set<Tag> tag = new HashSet<>();
         Tag tag_1 = new Tag(ETag.FITNESS);
-        tag_1.setId(new Long(1));
+        tag_1.setId(new Integer(1));
         tag_1.setTagLevel(new Level(ELevel.FIRST_LEVEL));
         Tag tag_2 = new Tag(ETag.CROSSFIT);
-        tag_2.setId(new Long(2));
+        tag_2.setId(new Integer(2));
         tag_2.setTagLevel(new Level(ELevel.SECOND_LEVEL));
         Tag tag_3 = new Tag(ETag.JOGGING);
-        tag_3.setId(new Long(3));
+        tag_3.setId(new Integer(3));
         tag_3.setTagLevel(new Level(ELevel.THIRD_LEVEL));
         tag.add(tag_1);
         tag.add(tag_2);
@@ -215,13 +215,33 @@ public class UserTest {
     }
 
     @Test
+    @DisplayName("Проверяет изменение уровня тэга для пользователя.")
+    public void changeUserTagLevel() {
+        User user = userRepository.findByUserName(username).get();
+        Set<Tag> tag = new HashSet<>();
+        Tag tag_1 = new Tag(ETag.FITNESS);
+        tag_1.setId(new Integer(1));
+        tag_1.setTagLevel(new Level(ELevel.FIRST_LEVEL));
+        tag.add(tag_1);
+        user.setTags(tag);
+
+        Assert.assertTrue(user.getTags().toString().contains("FITNESS"));
+        Assert.assertTrue(user.getTags().toString().contains("FIRST_LEVEL"));
+
+        user.getTags().stream().findFirst().get().setTagLevel(new Level(ELevel.SECOND_LEVEL));
+
+        Assert.assertTrue(user.getTags().toString().contains("FITNESS"));
+        Assert.assertTrue(user.getTags().toString().contains("SECOND_LEVEL"));
+        Assert.assertFalse(user.getTags().toString().contains("THIRD_LEVEL"));
+
+    }
+
+    @Test
     @DisplayName("Проверяет изменение своих данных пользователем с правами ADMIN.")
     public void testChangeMyAdminData() throws Exception{
         String id = "1";
         JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
         tokenUtils.makeToken(username, jwtResponse.getToken());
-
-        //System.out.println("MyAdminData " + userRepository.findByUserName(username));
 
         this.mockMvc.perform(put("/api/auth/users/" + id)
                 .header("Authorization", "Bearer " + jwtResponse.getToken())
@@ -272,9 +292,9 @@ public class UserTest {
         this.mockMvc.perform(put("/api/auth/users/" + id)
                 .header("Authorization", "Bearer " + jwtResponse.getToken())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"userName\": \"admin2\", \"userEmail\": \"admin2@admin2.com\", \"password\": \"12345\"] }"))
-                .andExpect(status().is(400));
-        //.andExpect(jsonPath("message").value("You can edit only yourself data."));
+                .content("{ \"userName\": \"admin2\", \"userEmail\": \"admin2@admin2.com\", \"password\": \"12345\" }"))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("message").value("You can edit only yourself data."));
     }
 
     @Test

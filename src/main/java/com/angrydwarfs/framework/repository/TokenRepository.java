@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface TokenRepository extends JpaRepository<Token, Long> {
-    Optional<Token> findById(Long id);
+    Optional<Token> findById(Long token_id);
     Token findByToken(String token);
 
     List<Token> findByExpiryDateBefore(LocalDateTime localDateTime);

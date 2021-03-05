@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Тэги пользователя. Записывается в БД в таблицу с имененм tags.
@@ -39,35 +41,24 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "tags")
+@Table(name = "TAGS")
 @ToString(of = {"id", "tagName"})
 @EqualsAndHashCode(of = {"id"})
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "TAG_ID")
+    private Integer id;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(name = "TAG_NAME", length = 20)
     private ETag tagName;
 
-    @JsonIdentityInfo(
-            generator = ObjectIdGenerators.PropertyGenerator.class,
-            property = "id")
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User userTags;
-
-    @JsonIdentityInfo(
-            generator = ObjectIdGenerators.PropertyGenerator.class,
-            property = "id")
-    @ManyToOne
-    @JoinColumn(name = "activity_id")
-    private Activity userActivity;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "level_id")
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Level tagLevel;
+
+    @ManyToMany(mappedBy = "tags")
+    private Set<User> userSet = new HashSet<>();
 
     public Tag(ETag tagName) {
         this.tagName = tagName;

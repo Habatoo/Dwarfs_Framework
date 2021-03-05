@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = { "spring.config.location=classpath:application-test.yml" })
 @Sql(value = {"/create-user-before.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = {"/create-user-after.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-public class AuthModuleTests {
+public class AuthTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -90,6 +90,7 @@ public class AuthModuleTests {
         User user = userRepository.findByUserName("testmod").get();
         JwtResponse jwtResponse = tokenUtils.makeAuth(user.getUserName(), password);
         tokenUtils.makeToken("testmod", jwtResponse.getToken());
+        System.out.println("AuthTest.testCreateAdmin " + user.getMainRoles().toString());
         Assert.assertTrue(user.getMainRoles().toString().contains("ROLE_ADMINISTRATOR"));
         Assert.assertTrue(user.getMainRoles().toString().contains("ROLE_USER"));
         Assert.assertTrue(user.getMainRoles().toString().contains("ROLE_MODERATOR"));
@@ -125,6 +126,15 @@ public class AuthModuleTests {
                 .content("{ \"userName\": \"admin2\", \"email\": \"admin2@admin2.com\", \"password\": \"12345\", \"role\": [\"admin\"] }"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("message").value("User registered successfully!"));
+
+        User user = userRepository.findByUserName("admin2").get();
+        JwtResponse jwtResponse = tokenUtils.makeAuth(user.getUserName(), password);
+        tokenUtils.makeToken("admin2", jwtResponse.getToken());
+        Assert.assertTrue(user.getMainRoles().toString().contains("ROLE_ADMINISTRATOR"));
+        Assert.assertFalse(user.getMainRoles().toString().contains("ROLE_USER"));
+        Assert.assertFalse(user.getMainRoles().toString().contains("ROLE_MODERATOR"));
+        Assert.assertTrue(user.getSubRoles().toString().contains("COMMON_USER"));
+        Assert.assertTrue(user.getUserEmail().contains("admin2@admin2.com"));
     }
 
     @Test

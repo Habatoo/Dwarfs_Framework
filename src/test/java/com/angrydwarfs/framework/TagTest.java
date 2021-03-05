@@ -18,11 +18,17 @@ package com.angrydwarfs.framework;
 
 import com.angrydwarfs.framework.controllers.TagController;
 import com.angrydwarfs.framework.controllers.UserController;
+import com.angrydwarfs.framework.models.Enums.ELevel;
+import com.angrydwarfs.framework.models.Enums.ETag;
+import com.angrydwarfs.framework.models.Tag;
+import com.angrydwarfs.framework.models.User;
 import com.angrydwarfs.framework.payload.response.JwtResponse;
+import com.angrydwarfs.framework.repository.LevelRepository;
 import com.angrydwarfs.framework.repository.TagRepository;
 import com.angrydwarfs.framework.repository.TokenRepository;
 import com.angrydwarfs.framework.repository.UserRepository;
 import com.angrydwarfs.framework.security.jwt.TokenUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
@@ -35,6 +41,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -56,6 +65,9 @@ public class TagTest {
 
     @Autowired
     TokenRepository tokenRepository;
+
+    @Autowired
+    LevelRepository levelRepository;
 
     @Autowired
     private UserController userController;
@@ -86,19 +98,68 @@ public class TagTest {
     }
 
     @Test
-    @DisplayName("Проверяет добавление тэгов пользователю USER.")
-    public void testUserAddTags() throws Exception{
-        JwtResponse jwtResponse = tokenUtils.makeAuth("user", password);
+    @DisplayName("Проверяет добавление тэгов пользователю ADMIN.")
+    public void testAdminAddTags() throws Exception{
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
         tokenUtils.makeToken(username, jwtResponse.getToken());
 
-        this.mockMvc.perform(put("/api/auth/tags/addTags")
+        this.mockMvc.perform(put("/api/auth/tags/addUserTags")
                 .header("Authorization", "Bearer " + jwtResponse.getToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"tags\": [\"JOGGING\", \"FITNESS\"] }"))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("message").value("Tags was added successfully!"));
 
-//        User user = userRepository.findByUserName("user").get();
-//        System.out.println("UserTest.testUserAddTags " + user);
+        User user = userRepository.findByUserName(username).get();
+        Assert.assertTrue(user.getTags().toString().contains("JOGGING"));
+        Assert.assertTrue(user.getTags().toString().contains("FITNESS"));
+        Assert.assertFalse(user.getTags().toString().contains("CROSSFIT"));
+
     }
+
+    @Test
+    @DisplayName("Проверяет добавление тэгов пользователю USER.")
+    public void testUserAddTags() throws Exception{
+        JwtResponse jwtResponse = tokenUtils.makeAuth("user", password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        this.mockMvc.perform(put("/api/auth/tags/addUserTags")
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"tags\": [\"JOGGING\", \"FITNESS\"] }"))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("message").value("Tags was added successfully!"));
+
+        User user = userRepository.findByUserName("user").get();
+        Assert.assertTrue(user.getTags().toString().contains("JOGGING"));
+        Assert.assertTrue(user.getTags().toString().contains("FITNESS"));
+        Assert.assertFalse(user.getTags().toString().contains("CROSSFIT"));
+    }
+
+    @Test
+    @DisplayName("Проверяет изменение тэгов activity ADMIN.")
+    public void testChangeUserTagsLevel() throws Exception{
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+        String tagName = "JOGGING";
+        String tagLevel = "2";
+
+        User user = userRepository.findByUserName(username).get();
+        Set<Tag> tags = new HashSet<>();
+        Tag tempTag = tagRepository.findByTagName(ETag.valueOf(tagName)).get();
+        tempTag.setTagLevel(levelRepository.findByLevelName(ELevel.FIRST_LEVEL).get());
+        tags.add(tempTag);
+        user.setTags(tags);
+
+        Assert.assertTrue(user.getTags().toString().contains("JOGGING"));
+        Assert.assertTrue(user.getTags().toString().contains("FIRST_LEVEL"));
+
+        this.mockMvc.perform(put("/api/auth/tags/changeUserTagsLevel/" + tagName + "/" + tagLevel)
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("message").value("Tag was changed successfully!"));
+
+    }
+
 }

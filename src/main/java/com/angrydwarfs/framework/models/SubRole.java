@@ -35,17 +35,22 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "sub_roles")
+@Table(name = "SUB_ROLES")
 @ToString(of = {"id", "subRoleName"})
 @EqualsAndHashCode(of = {"id"})
 public class SubRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="SUB_ROLE_ID")
     private Integer id;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(name = "SUB_ROLE_NAME", length = 20)
     private ESubRole subRoleName;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="SUB_ROLE_USER")
+    private User subRoleUser;
 
     public SubRole(ESubRole subRoleName) {
         this.subRoleName = subRoleName;

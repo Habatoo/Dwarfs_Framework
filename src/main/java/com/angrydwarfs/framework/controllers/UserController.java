@@ -126,7 +126,7 @@ public class UserController {
      * @method changeUser - при http PUT запросе по адресу .../api/auth/users/{id}
      * {id} - входные данные - id пользователя, данные которого редактируются, id не редактируетс
      * возвращает данные
-     * @return - измененные данные пользовалеля, id изменению не подлежит.
+     * @return - измененные данные пользователя, id изменению не подлежит.
      * @param userFromDb - данные пользователя отредактированные из формы
      * @param user - текущие данные пользователя
      * @see UserRepository
@@ -143,14 +143,12 @@ public class UserController {
         if(!(userFromDb.getId() == userRepository.findByUserName(authentication.getName()).get().getId())) {
             // admin check
             if(userRepository.findByUserName(authentication.getName()).get().getMainRoles().size() == 3) {
-                //BeanUtils.copyProperties(user, userRepository.findById(userFromDb.getId()).get(), "id");
                 return userUtils.checkUserNameAndEmail(user, userFromDb);
             }
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("You can edit only yourself data."));
         } else {
-            //BeanUtils.copyProperties(user, userRepository.findById(userFromDb.getId()).get(), "id");
             return userUtils.checkUserNameAndEmail(user, userFromDb);
         }
 
@@ -164,7 +162,7 @@ public class UserController {
      */
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR')")
-    public ResponseEntity<?>  deleteUser(@PathVariable("id") User user) {
+    public ResponseEntity<?> deleteUser(@PathVariable("id") User user) {
         try {
             userRepository.delete(user);
             return ResponseEntity.ok(new MessageResponse("User was deleted successfully!"));
@@ -183,7 +181,7 @@ public class UserController {
      */
     @DeleteMapping("/tokens")
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
-    public ResponseEntity<?>  clearTokens() {
+    public ResponseEntity<?> clearTokens() {
 
         try {
             List<Token> tokens = tokenRepository.findByExpiryDateBefore(LocalDateTime.now());

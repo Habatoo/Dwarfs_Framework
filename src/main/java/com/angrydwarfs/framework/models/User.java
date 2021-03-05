@@ -56,90 +56,110 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "usr")
+@Table(name = "USR")
 @ToString(of = {"id", "userName", "password", "userEmail", "creationDate", "activationStatus"})
 @EqualsAndHashCode(of = {"id"})
 public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     @Id
+    @Column(name="USER_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name="SOCIAL_NET_ID")
     private String socialNetId;
+
+    @Column(name="USER_LOCALE")
     private String userLocale;
 
     @NotBlank(message = "Username cannot be empty")
+    @Column(name="USER_NAME", length = 100, nullable = false)
     @JsonView(Views.UserShortData.class)
     private String userName;
 
     @NotBlank(message = "Password cannot be empty")
+    @Column(name="USER_PASSWORD", length = 100)
     private String password;
 
     @Email(message = "Email is not correct")
     @NotBlank(message = "Email cannot be empty")
+    @Column(name="USER_EMAIL", length = 100, nullable = false)
     //@JsonView(Views.AllData.class)
     private String userEmail;
 
     //@JsonView(Views.AllData.class)
+    @Column(name="USER_EMAIL_ACTIVATION_STATUS")
     private boolean activationEmailStatus;
+
+    @Column(name="USER_EMAIL_ACTIVATION_CODE")
     private String activationEmailCode;
 
-    @Column(updatable = false)
+    @Column(name="USER_CREATION_DATE", updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonView(Views.UserShortData.class)
     private LocalDateTime creationDate;
 
+    @Column(name="USER_LAST_VISITED_DATE")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonView(Views.UserShortData.class)
     private LocalDateTime lastVisitedDate;
 
     ///////////////////////////////////////////////
     // User status
-    @JsonIdentityInfo(
-            generator = ObjectIdGenerators.PropertyGenerator.class,
-            property = "id")
-    @OneToMany(mappedBy = "userCurrentStatus", fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name="ID_STATUS")
     @JsonView(Views.UserShortData.class)
     private Set<Status> userStatus;
 
     // User status start date
-    @Column
+    @Column(name="USER_STATUS_START_DATE")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime statusStartDate;
 
     // User status end date
-    @Column
+    @Column(name="USER_STATUS_END_DATE")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime statusEndDate;
     ////////////////////////////////////////////////////
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(	name = "user_main_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "main_role_id"))
+    @JoinTable(	name = "USER_MAIN_ROLE",
+            joinColumns = @JoinColumn(name = "USER_ID"),
+            inverseJoinColumns = @JoinColumn(name = "MAIN_ROLE_ID"))
     private Set<MainRole> mainRoles = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(	name = "user_sub_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "sub_role_id"))
+    @JoinTable(	name = "USER_SUB_ROLE",
+        joinColumns = @JoinColumn(name = "USER_ID"),
+        inverseJoinColumns = @JoinColumn(name = "SUB_ROLE_ID"))
     private Set<SubRole> subRoles = new HashSet<>();
 
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,
             property = "id")
     @OneToMany(mappedBy = "userTokens", fetch = FetchType.EAGER, orphanRemoval = true)
+    @Column(name="USER_TOKENS")
     private Set<Token> tokens = new HashSet<>();
 
+    // TODO список участников
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,
             property = "id")
     @OneToMany(mappedBy = "userActivities", fetch = FetchType.EAGER, orphanRemoval = true)
+    @Column(name="USER_ACTIVITIES")
     private Set<Activity> activities = new HashSet<>();
 
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,
             property = "id")
-    @OneToMany(mappedBy = "userTags", fetch = FetchType.EAGER, orphanRemoval = true)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinTable(name = "USER_TAG",
+            joinColumns = @JoinColumn(name = "ID_USER_TAG"),
+            inverseJoinColumns = @JoinColumn(name = "ID_TAG_USER")
+    )
+    @Column(name="USER_TAGS")
     //@JsonView(Views.ShortData.class)
     private Set<Tag> tags = new HashSet<>();
 
@@ -165,12 +185,22 @@ public class User implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id);
+        if (id == null) {
+            if (user.id != null)
+                return false;
+        } else if (!id.equals(user.id))
+            return false;
+        return true;
+        //return Objects.equals(id, user.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
+        //return Objects.hash(id);
     }
 
 

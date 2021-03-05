@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MoneyTest {
+    // @Column(name="POPULATION_DENSITY", precision=12, scale=2, nullable = false)
     @Test
     @DisplayName("Проверяет формат введенных данных - два знака после запятой, значение валюты")
     void testMoneyContent() {

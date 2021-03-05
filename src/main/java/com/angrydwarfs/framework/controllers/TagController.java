@@ -18,6 +18,7 @@ package com.angrydwarfs.framework.controllers;
 
 import com.angrydwarfs.framework.models.Enums.ELevel;
 import com.angrydwarfs.framework.models.Enums.ETag;
+import com.angrydwarfs.framework.models.Level;
 import com.angrydwarfs.framework.models.Tag;
 import com.angrydwarfs.framework.models.User;
 import com.angrydwarfs.framework.payload.request.UserEditRequest;
@@ -77,11 +78,11 @@ public class TagController {
     /**
      * @method addUserTags - при http PUT запросе по адресу .../api/auth/tags/addTags добавляет тэг 1 уровня для пользователя
      * метод доступен пользоватлю без привелегий, служит указанием интереса пользователя.
-     * @param userEditRequest
-     * @param authentication
+     * @param userEditRequest параметры с именами тэгов
+     * @param authentication текущий пользователь
      * @return
      */
-    @PutMapping("/addTags")
+    @PutMapping("/addUserTags")
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR') or hasRole('ROLE_USER')")
     public ResponseEntity<?> addUserTags(
             @RequestBody UserEditRequest userEditRequest,
@@ -98,63 +99,41 @@ public class TagController {
             }
         }
         user.setTags(tags);
-        //userRepository.save(user);
+        userRepository.save(user);
         return ResponseEntity.ok(new MessageResponse("Tags was added successfully!"));
 
-//        // check ID current user = ID edit user
-//        User user = userRepository.findByUserName(authentication.getName()).get();
-//        if((userRepository.findByUserName(userEditRequest.getUserName()).equals(userRepository.findByUserName(authentication.getName()).get().getId()))) {
-//            // admin check
-//            if(userRepository.findByUserName(authentication.getName()).get().getMainRoles().size() == 3) {
-//                Set<Tag> tags = new HashSet<>();
-//                try {
-//                    Set<String> strTags = userEditRequest.getTags();
-//                    if (strTags != null) {
-//                        for (String tag : strTags) {
-//                            Tag tempTag = tagRepository.findByTagName(ETag.valueOf(tag)).get();
-//                            tempTag.setTagLevel(levelRepository.findByLevelName(ELevel.FIRST_LEVEL).get());
-//                            tags.add(tempTag);
-//                        }
-//                    }
-//                    user.setTags(tags);
-//                } catch (Exception e) {
-//                    return ResponseEntity.ok(new MessageResponse("Tags is not exist!" + e));
-//                }
-//                //////////////////////////////////
-//                userRepository.save(user);
-//                return ResponseEntity.ok(new MessageResponse("Tags was added successfully!"));
-//            }
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new MessageResponse("You can edit only yourself data."));
-//        } else {
-//            //BeanUtils.copyProperties(user, userRepository.findById(userFromDb.getId()).get(), "id");
-//            Set<Tag> tags = new HashSet<>();
-//            try {
-//                Set<String> strTags = userEditRequest.getTags();
-//                if (strTags != null) {
-//                    for (String tag : strTags) {
-//                        Tag tempTag = tagRepository.findByTagName(ETag.valueOf(tag)).get();
-//                        tempTag.setTagLevel(levelRepository.findByLevelName(ELevel.FIRST_LEVEL).get());
-//                        tags.add(tempTag);
-//                    }
-//                }
-//
-//            } catch (Exception e) {
-//                return ResponseEntity
-//                        .badRequest()
-//                        .body(new MessageResponse("Tags is not exist!" + e));
-//            }
-//            //////////////////////////////////
-//            user.setTags(tags);
-//            System.out.println("User " + user.getTags());
-//            System.out.println("User " + user.getUserName());
-//            System.out.println("User " + user.getUserEmail());
-//            System.out.println("User " + user.getMainRoles());
-//            System.out.println("User " + user.getCreationDate());
-//            //userRepository.save(user);
-//            return ResponseEntity.ok(new MessageResponse("Tags was added successfully!"));
-//        }
+    }
+
+    /**
+     * @method changeUserTagsLevel - при http PUT запросе по адресу .../changeUserTagsLevel/{tag_name}/{tag_level} изменяет уровень тэга для пользователя
+     * @param tagName - имя тэга
+     * @param tagLevel - новый уровень тэга
+     * @param authentication - пользователь
+     * @return
+     */
+    @PutMapping("/changeUserTagsLevel/{tag_name}/{tag_level}")
+    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR')")
+    public ResponseEntity<?> setUserTagsLevel(
+            @PathVariable("tag_name") String tagName,
+            @PathVariable("tag_level") String tagLevel,
+            Authentication authentication) {
+
+        User user = userRepository.findByUserName(authentication.getName()).get();
+        Set<Tag> tags = new HashSet<>();
+
+        try {
+            Tag tempTag = tagRepository.findByTagName(ETag.valueOf(tagName)).get();
+            tempTag.setTagLevel(levelRepository.findById(Integer.parseInt(tagLevel)).get());
+            tags.add(tempTag);
+            user.setTags(tags);
+            userRepository.save(user);
+            return ResponseEntity.ok(new MessageResponse("Tag was changed successfully!"));
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Tag was not found!"));
+        }
+
 
     }
 }

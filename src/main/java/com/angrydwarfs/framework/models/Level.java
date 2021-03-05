@@ -36,20 +36,21 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "levels")
+@Table(name = "LEVELS")
 @ToString(of = {"id", "levelName"})
 @EqualsAndHashCode(of = {"id"})
 public class Level {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name="LEVEL_ID")
+    private Integer id;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(name = "LEVEL_NAME", length = 20)
     private ELevel levelName;
 
-    @OneToOne(mappedBy = "tagLevel")
-    private Tag tagLevel;
+    @OneToOne(mappedBy = "tagLevel", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Tag levelTag;
 
     public Level(ELevel levelName) {
         this.levelName = levelName;

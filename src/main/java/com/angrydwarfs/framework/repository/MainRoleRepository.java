@@ -24,6 +24,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface MainRoleRepository extends JpaRepository<MainRole, Long> {
+public interface MainRoleRepository extends JpaRepository<MainRole, Integer> {
     Optional<MainRole> findByMainRoleName(EMainRole mainRoleName);
 }

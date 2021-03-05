@@ -8,10 +8,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface TagRepository extends JpaRepository<Tag, Long> {
-    Optional<Tag> findById(Long id);
+public interface TagRepository extends JpaRepository<Tag, Integer> {
+    Optional<Tag> findById(Integer tag_id);
     Optional<Tag> findByTagName(ETag tagName);
-    //Optional<Tag> findByTagName(String tagName);
 
     Boolean existsByTagName(ETag tagName);
 }

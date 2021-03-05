@@ -171,7 +171,7 @@ public class ActivityController {
             if(userRepository.findByUserName(authentication.getName()).get().getMainRoles().size() >= 3) {
                 //BeanUtils.copyProperties(activity, activityFromDb, "id");
                 activityFromDb.setActivityTitle(activity.getActivityTitle());
-                activityFromDb.setActivityBody(activity.getActivityBody());
+                activityFromDb.setActivityDescription(activity.getActivityDescription());
                 activityRepository.save(activityFromDb);
                 return ResponseEntity.ok(new MessageResponse("Activity was update successfully!"));
             }
@@ -181,7 +181,7 @@ public class ActivityController {
         } else {
             //BeanUtils.copyProperties(activity, activityFromDb, "id");
             activityFromDb.setActivityTitle(activity.getActivityTitle());
-            activityFromDb.setActivityBody(activity.getActivityBody());
+            activityFromDb.setActivityDescription(activity.getActivityDescription());
             activityRepository.save(activityFromDb);
             return ResponseEntity.ok(new MessageResponse("Activity was update successfully!"));
         }

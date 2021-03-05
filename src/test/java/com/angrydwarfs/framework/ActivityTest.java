@@ -112,13 +112,13 @@ public class ActivityTest {
         System.out.println("ActivityTest.createNewActivity " + activityRepository.findByUserActivities(user));
 
         assertEquals("First activity", activityList.get(0).getActivityTitle());
-        assertEquals("First user body activity FIRST", activityList.get(0).getActivityBody());
+        assertEquals("First user body activity FIRST", activityList.get(0).getActivityDescription());
         assertEquals(LocalDateTime.now().getYear(), activityList.get(0).getCreationDate().getYear());
         assertEquals(LocalDateTime.now().getMonth(), activityList.get(0).getCreationDate().getMonth());
         assertEquals(LocalDateTime.now().getDayOfMonth(), activityList.get(0).getCreationDate().getDayOfMonth());
 
         assertEquals("Second activity", activityList.get(1).getActivityTitle());
-        assertEquals("First user body activity SECOND", activityList.get(1).getActivityBody());
+        assertEquals("First user body activity SECOND", activityList.get(1).getActivityDescription());
         assertEquals(LocalDateTime.now().getYear(), activityList.get(1).getCreationDate().getYear());
         assertEquals(LocalDateTime.now().getMonth(), activityList.get(1).getCreationDate().getMonth());
         assertEquals(LocalDateTime.now().getDayOfMonth(), activityList.get(1).getCreationDate().getDayOfMonth());
@@ -137,7 +137,7 @@ public class ActivityTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(content().string("[{\"activityTitle\":\"First activity\",\"activityBody\":\"First user body activity FIRST\",\"creationDate\":\"" + date + "\",\"userActivities\":{\"userName\":\"admin\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]},{\"activityTitle\":\"Second activity\",\"activityBody\":\"First user body activity SECOND\",\"creationDate\":\"" + date + "\",\"userActivities\":{\"userName\":\"admin\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]}]"));
+                .andExpect(content().string("[{\"activityTitle\":\"First activity\",\"activityDescription\":\"First user body activity FIRST\",\"latitude\":null,\"longitude\":null,\"activityAddress\":null,\"creationDate\":\"" + date + "\",\"dateOfActivity\":null,\"userActivities\":{\"userName\":\"admin\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]},{\"activityTitle\":\"Second activity\",\"activityDescription\":\"First user body activity SECOND\",\"latitude\":null,\"longitude\":null,\"activityAddress\":null,\"creationDate\":\"" + date + "\",\"dateOfActivity\":null,\"userActivities\":{\"userName\":\"admin\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]}]"));
     }
 
     @Test
@@ -153,7 +153,7 @@ public class ActivityTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(content().string("[{\"activityTitle\":\"Fourth activity\",\"activityBody\":\"Third user body activity FOURTH\",\"creationDate\":\"" + date + "\",\"userActivities\":{\"userName\":\"user\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]}]"));
+                .andExpect(content().string("[{\"activityTitle\":\"Fourth activity\",\"activityDescription\":\"Third user body activity FOURTH\",\"latitude\":null,\"longitude\":null,\"activityAddress\":null,\"creationDate\":\"" + date + "\",\"dateOfActivity\":null,\"userActivities\":{\"userName\":\"user\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]}]"));
     }
 
     @Test
@@ -167,7 +167,7 @@ public class ActivityTest {
         activityRepository.save(activity);
 
         assertEquals("Test title", activity.getActivityTitle());
-        assertEquals("Body message of test activity", activity.getActivityBody());
+        assertEquals("Body message of test activity", activity.getActivityDescription());
         assertEquals(LocalDateTime.now().getYear(), activity.getCreationDate().getYear());
         assertEquals(LocalDateTime.now().getMonth(), activity.getCreationDate().getMonth());
         assertEquals(LocalDateTime.now().getDayOfMonth(), activity.getCreationDate().getDayOfMonth());
@@ -188,7 +188,7 @@ public class ActivityTest {
         activityRepository.save(activity);
 
         assertEquals("Test user title", activity.getActivityTitle());
-        assertEquals("Body user message of test activity", activity.getActivityBody());
+        assertEquals("Body user message of test activity", activity.getActivityDescription());
         assertEquals(LocalDateTime.now().getYear(), activity.getCreationDate().getYear());
         assertEquals(LocalDateTime.now().getMonth(), activity.getCreationDate().getMonth());
         assertEquals(LocalDateTime.now().getDayOfMonth(), activity.getCreationDate().getDayOfMonth());
@@ -215,7 +215,7 @@ public class ActivityTest {
 
         Activity activity = activityRepository.findById(new Long(10)).get();
         assertEquals("Test activity", activity.getActivityTitle());
-        assertEquals("Test activity body", activity.getActivityBody());
+        assertEquals("Test activity body", activity.getActivityDescription());
         assertEquals(2021, activity.getCreationDate().getYear());
         assertEquals(java.time.Month.FEBRUARY, activity.getCreationDate().getMonth());
         assertEquals(22, activity.getCreationDate().getDayOfMonth());
@@ -228,9 +228,9 @@ public class ActivityTest {
 //        System.out.println("Activity " + activityRepository.findById(new Long(10)).get().getTags().toString().contains("JOGGING"));
 //        System.out.println("Activity " + activityRepository.findById(new Long(10)).get().getTags().toString().contains("CROSSFIT"));
 
-//        Assert.assertTrue(activityRepository.findById(new Long(10)).get().getTags().toString().contains("JOGGING"));
-//        Assert.assertTrue(activity.getTags().toString().contains("FITNESS"));
-//        Assert.assertFalse(activity.getTags().toString().contains("CROSSFIT"));
+        Assert.assertTrue(activityRepository.findById(new Long(10)).get().getTags().toString().contains("JOGGING"));
+        Assert.assertTrue(activity.getTags().toString().contains("FITNESS"));
+        Assert.assertFalse(activity.getTags().toString().contains("CROSSFIT"));
     }
 
     @Test
@@ -248,7 +248,7 @@ public class ActivityTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.activityTitle").value("Third activity"))
-                .andExpect(jsonPath("$.activityBody").value("Second user body activity THIRD"))
+                .andExpect(jsonPath("$.activityDescription").value("Second user body activity THIRD"))
                 .andExpect(jsonPath("$.creationDate").value(date))
                 .andExpect(jsonPath("$.userActivities").isNotEmpty());
     }
@@ -263,13 +263,13 @@ public class ActivityTest {
         this.mockMvc.perform(put("/api/auth/users/activities/" + id)
                 .header("Authorization", "Bearer " + jwtResponse.getToken())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"activityTitle\": \"Third edit activity\", \"activityBody\": \"Second edit user body activity THIRD\" }"))
+                .content("{ \"activityTitle\": \"Third edit activity\", \"activityDescription\": \"Second edit user body activity THIRD\" }"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("message").value("Activity was update successfully!"));
 
         assertEquals("Third edit activity", activityRepository.findById(new Long(1)).get().getActivityTitle());
-        assertEquals("Second edit user body activity THIRD", activityRepository.findById(new Long(1)).get().getActivityBody());
+        assertEquals("Second edit user body activity THIRD", activityRepository.findById(new Long(1)).get().getActivityDescription());
     }
 
     @Test
@@ -282,13 +282,13 @@ public class ActivityTest {
         this.mockMvc.perform(put("/api/auth/users/activities/" + id)
                 .header("Authorization", "Bearer " + jwtResponse.getToken())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"activityTitle\": \"Third edit activity\", \"activityBody\": \"Second edit user body activity THIRD\" }"))
+                .content("{ \"activityTitle\": \"Third edit activity\", \"activityDescription\": \"Second edit user body activity THIRD\" }"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("message").value("Activity was update successfully!"));
 
         assertEquals("Third edit activity", activityRepository.findById(new Long(4)).get().getActivityTitle());
-        assertEquals("Second edit user body activity THIRD", activityRepository.findById(new Long(4)).get().getActivityBody());
+        assertEquals("Second edit user body activity THIRD", activityRepository.findById(new Long(4)).get().getActivityDescription());
     }
 
     @Test
@@ -301,13 +301,13 @@ public class ActivityTest {
         this.mockMvc.perform(put("/api/auth/users/activities/" + id)
                 .header("Authorization", "Bearer " + jwtResponse.getToken())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"activityTitle\": \"Third edit activity\", \"activityBody\": \"Second edit user body activity THIRD\" }"))
+                .content("{ \"activityTitle\": \"Third edit activity\", \"activityDescription\": \"Second edit user body activity THIRD\" }"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("message").value("Activity was update successfully!"));
 
         assertEquals("Third edit activity", activityRepository.findById(new Long(4)).get().getActivityTitle());
-        assertEquals("Second edit user body activity THIRD", activityRepository.findById(new Long(4)).get().getActivityBody());
+        assertEquals("Second edit user body activity THIRD", activityRepository.findById(new Long(4)).get().getActivityDescription());
     }
 
     @Test
@@ -320,7 +320,7 @@ public class ActivityTest {
         this.mockMvc.perform(put("/api/auth/users/activities/" + id)
                 .header("Authorization", "Bearer " + jwtResponse.getToken())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"activityTitle\": \"Third edit activity\", \"activityBody\": \"Second edit user body activity THIRD\" }"))
+                .content("{ \"activityTitle\": \"Third edit activity\", \"activityDescription\": \"Second edit user body activity THIRD\" }"))
                 .andDo(print())
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("message").value("You can edit only yourself data!"));

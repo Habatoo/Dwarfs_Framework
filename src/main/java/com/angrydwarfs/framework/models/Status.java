@@ -32,25 +32,18 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
-@Table(name = "status")
+@Table(name = "STATUS")
 @ToString(of = {"id", "statusName", "activationDate", "endDate"})
 @EqualsAndHashCode(of = {"id"})
 public class Status {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "STATUS_ID")
+    private Integer id;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(name = "USER_STATUS", length = 20)
     private EStatus userStatus;
-
-    @JsonIdentityInfo(
-            generator = ObjectIdGenerators.PropertyGenerator.class,
-            property = "id")
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User userCurrentStatus;
 
     public Status() {
         this.userStatus = EStatus.COMMON;

@@ -34,34 +34,31 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "tokens")
+@Table(name = "TOKENS")
 @ToString(of = {"id", "token", "creationDate", "expiryDate", "active"})
 @EqualsAndHashCode(of = {"id"})
 public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "TOKEN_ID")
     private Long id;
 
-    @Column(name = "token", nullable = false, unique = true, length = 500)
+    @Column(name = "TOKEN", nullable = false, unique = true, length = 500)
     private String token;
 
-    @Column(updatable = false)
+    @Column(name = "TOKEN_CREATION_DATE", updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime creationDate;
 
-    @Column(updatable = false)
+    @Column(name = "TOKEN_EXPIRY_DATE", updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime expiryDate;
 
-    @Column(name = "active")
+    @Column(name = "TOKEN_STATUS")
     private boolean active;
 
-    @JsonIdentityInfo(
-            generator = ObjectIdGenerators.PropertyGenerator.class,
-            property = "id")
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TOKEN_USER_ID")
     private User userTokens;
 
     public Token(String token, User userTokens) {
