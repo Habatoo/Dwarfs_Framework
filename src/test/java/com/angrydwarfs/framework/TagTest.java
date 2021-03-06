@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -154,11 +155,35 @@ public class TagTest {
         Assert.assertTrue(user.getTags().toString().contains("JOGGING"));
         Assert.assertTrue(user.getTags().toString().contains("FIRST_LEVEL"));
 
-        this.mockMvc.perform(put("/api/auth/tags/changeUserTagsLevel/" + tagName + "/" + tagLevel)
+        this.mockMvc.perform(put("/api/auth/tags/changeUserTagsLevel/" + username + "/" + tagName + "/" + tagLevel)
                 .header("Authorization", "Bearer " + jwtResponse.getToken())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("message").value("Tag was changed successfully!"));
+
+    }
+
+    @Test
+    @DisplayName("Проверяет удаление тэга пользователя ADMIN.")
+    public void testUserDeleteTags() throws Exception{
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+        String tagName = "JOGGING";
+
+        User user = userRepository.findByUserName(username).get();
+        Set<Tag> tags = new HashSet<>();
+        Tag tempTag = tagRepository.findByTagName(ETag.valueOf(tagName)).get();
+        tempTag.setTagLevel(levelRepository.findByLevelName(ELevel.FIRST_LEVEL).get());
+        tags.add(tempTag);
+        user.setTags(tags);
+
+        Assert.assertTrue(user.getTags().toString().contains("JOGGING"));
+
+        this.mockMvc.perform(delete("/api/auth/tags/deleteTag/" + username + "/" + tagName)
+                .header("Authorization", "Bearer " + jwtResponse.getToken())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("message").value("Tag was deleted successfully!"));
 
     }
 

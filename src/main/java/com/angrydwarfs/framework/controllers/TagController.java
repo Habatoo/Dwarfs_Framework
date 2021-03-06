@@ -108,17 +108,17 @@ public class TagController {
      * @method changeUserTagsLevel - при http PUT запросе по адресу .../changeUserTagsLevel/{tag_name}/{tag_level} изменяет уровень тэга для пользователя
      * @param tagName - имя тэга
      * @param tagLevel - новый уровень тэга
-     * @param authentication - пользователь
+     * @param userName - данные пользователя для изменения
      * @return
      */
-    @PutMapping("/changeUserTagsLevel/{tag_name}/{tag_level}")
+    @PutMapping("/changeUserTagsLevel/{username}/{tag_name}/{tag_level}")
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR')")
     public ResponseEntity<?> setUserTagsLevel(
             @PathVariable("tag_name") String tagName,
             @PathVariable("tag_level") String tagLevel,
-            Authentication authentication) {
+            @PathVariable("username") String userName) {
 
-        User user = userRepository.findByUserName(authentication.getName()).get();
+        User user = userRepository.findByUserName(userName).get();
         Set<Tag> tags = new HashSet<>();
 
         try {
@@ -133,7 +133,36 @@ public class TagController {
                     .badRequest()
                     .body(new MessageResponse("Error: Tag was not found!"));
         }
+    }
 
+    @DeleteMapping("/deleteTag/{username}/{tag_name}")
+    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR') or hasRole('ROLE_USER')")
+    public ResponseEntity<?> deleteTag(
+            @PathVariable("tag_name") String tagName,
+            @PathVariable("username") String userName) {
+        User user = userRepository.findByUserName(userName).get();
 
+        try {
+            Tag tempTag = tagRepository.findByTagName(ETag.valueOf(tagName)).get();
+            Set<Tag> tags = user.getTags();
+            user.setTags(new HashSet<>());
+            Set<Tag> newTags = new HashSet<>();
+
+            if (tags != null) {
+                for (Tag tag : tags) {
+                    if (!tag.equals(tagRepository.findByTagName(ETag.valueOf(tagName)).get())) {
+                        newTags.add(tempTag);
+                    }
+                }
+            }
+            user.setTags(newTags);
+            userRepository.save(user);
+
+            return ResponseEntity.ok(new MessageResponse("Tag was deleted successfully!"));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Tag was not deleted!"));
+        }
     }
 }
