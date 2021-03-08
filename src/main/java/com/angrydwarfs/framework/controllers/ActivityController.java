@@ -143,9 +143,7 @@ public class ActivityController {
         }
         //////////////////////////////////
         activityRepository.save(activity);
-//        System.out.println("Activity " + activityRepository.findById(new Long(10)).get().getTags().toString().contains("FITNESS"));
-//        System.out.println("Activity " + activityRepository.findById(new Long(10)).get().getTags().toString().contains("JOGGING"));
-//        System.out.println("Activity " + activityRepository.findById(new Long(10)).get().getTags().toString().contains("CROSSFIT"));
+
         return ResponseEntity.ok(new MessageResponse("Activity create successfully!"));
     }
 

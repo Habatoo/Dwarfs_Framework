@@ -16,10 +16,7 @@
 
 package com.angrydwarfs.framework.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
 import javax.persistence.*;
@@ -125,36 +122,48 @@ public class User implements Serializable {
     ////////////////////////////////////////////////////
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @JsonIdentityReference
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
     @JoinTable(	name = "USER_MAIN_ROLE",
             joinColumns = @JoinColumn(name = "USER_ID"),
             inverseJoinColumns = @JoinColumn(name = "MAIN_ROLE_ID"))
     private Set<MainRole> mainRoles = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @JsonIdentityReference
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
     @JoinTable(	name = "USER_SUB_ROLE",
         joinColumns = @JoinColumn(name = "USER_ID"),
         inverseJoinColumns = @JoinColumn(name = "SUB_ROLE_ID"))
     private Set<SubRole> subRoles = new HashSet<>();
 
+    @OneToMany(mappedBy = "userTokens", fetch = FetchType.EAGER, orphanRemoval = true)
+    @JsonIdentityReference
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,
             property = "id")
-    @OneToMany(mappedBy = "userTokens", fetch = FetchType.EAGER, orphanRemoval = true)
     @Column(name="USER_TOKENS")
     private Set<Token> tokens = new HashSet<>();
 
     // TODO список участников
+    @OneToMany(mappedBy = "userActivities", fetch = FetchType.EAGER, orphanRemoval = true)
+    @JsonIdentityReference
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,
             property = "id")
-    @OneToMany(mappedBy = "userActivities", fetch = FetchType.EAGER, orphanRemoval = true)
+
     @Column(name="USER_ACTIVITIES")
     private Set<Activity> activities = new HashSet<>();
 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JsonIdentityReference
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,
             property = "id")
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "USER_TAG",
             joinColumns = @JoinColumn(name = "ID_USER_TAG"),
             inverseJoinColumns = @JoinColumn(name = "ID_TAG_USER")
@@ -162,6 +171,36 @@ public class User implements Serializable {
     @Column(name="USER_TAGS")
     //@JsonView(Views.ShortData.class)
     private Set<Tag> tags = new HashSet<>();
+
+    ////////////////////////////// User Subscriber
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_subscriptions",
+            joinColumns = @JoinColumn(name = "subscriber_id"),
+            inverseJoinColumns = @JoinColumn(name = "channel_id")
+    )
+    //@JsonView(Views.FullProfile.class)
+    @JsonIdentityReference
+    @JsonIdentityInfo(
+            property = "id",
+            generator = ObjectIdGenerators.PropertyGenerator.class
+    )
+    private Set<User> subscriptions = new HashSet<>();
+
+    @ManyToMany
+       @JoinTable(
+            name = "user_subscriptions",
+            joinColumns = @JoinColumn(name = "channel_id"),
+            inverseJoinColumns = @JoinColumn(name = "subscriber_id")
+    )
+    //@JsonView(Views.FullProfile.class)
+    @JsonIdentityReference
+    @JsonIdentityInfo(
+            property = "id",
+            generator = ObjectIdGenerators.PropertyGenerator.class
+    )
+    private Set<User> subscribers = new HashSet<>();
 
     /**
      * Конструктор для создания пользователя.

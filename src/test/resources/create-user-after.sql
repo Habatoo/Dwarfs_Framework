@@ -1,3 +1,4 @@
+DELETE FROM user_subscriptions;
 DELETE FROM user_main_role;
 DELETE FROM user_sub_role;
 DELETE FROM user_tag;
