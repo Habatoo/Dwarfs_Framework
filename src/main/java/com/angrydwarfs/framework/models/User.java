@@ -52,6 +52,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
+//@Builder
 @NoArgsConstructor
 @Table(name = "USR")
 @ToString(of = {"id", "userName", "password", "userEmail", "creationDate", "activationStatus"})
@@ -201,6 +202,9 @@ public class User implements Serializable {
             generator = ObjectIdGenerators.PropertyGenerator.class
     )
     private Set<User> subscribers = new HashSet<>();
+
+    //////////////////////////////
+//    private Profile userProfile;
 
     /**
      * Конструктор для создания пользователя.

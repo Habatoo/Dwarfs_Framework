@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models.Enums;
+package com.angrydwarfs.framework.exceptions;
 
-import com.angrydwarfs.framework.models.MainRole;
+public class UsernameAlreadyExistsException extends RuntimeException {
 
-/**
- * Перечень возможных ролей по доступу пользователя.
- * @see MainRole (таблица ролей).
- * @version 0.001
- * @author habatoo
- */
-public enum EMainRole {
-    ROLE_USER,
-    FACEBOOK_USER,
-    ROLE_MODERATOR,
-    ROLE_ADMINISTRATOR
+    public UsernameAlreadyExistsException(String message) {
+        super(message);
+    }
 }

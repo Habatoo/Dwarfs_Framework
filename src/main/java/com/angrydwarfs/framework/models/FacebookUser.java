@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models.Enums;
+package com.angrydwarfs.framework.models;
 
-import com.angrydwarfs.framework.models.MainRole;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * Перечень возможных ролей по доступу пользователя.
- * @see MainRole (таблица ролей).
- * @version 0.001
- * @author habatoo
- */
-public enum EMainRole {
-    ROLE_USER,
-    FACEBOOK_USER,
-    ROLE_MODERATOR,
-    ROLE_ADMINISTRATOR
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class FacebookUser {
+    private String id;
+    @JsonProperty("first_name")
+    private String firstName;
+    @JsonProperty("last_name")
+    private String lastName;
+    private String email;
+    //private FacebookPicture picture;
 }

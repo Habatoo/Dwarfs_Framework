@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models.Enums;
+package com.angrydwarfs.framework.models;
 
-import com.angrydwarfs.framework.models.MainRole;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * Перечень возможных ролей по доступу пользователя.
- * @see MainRole (таблица ролей).
- * @version 0.001
- * @author habatoo
- */
-public enum EMainRole {
-    ROLE_USER,
-    FACEBOOK_USER,
-    ROLE_MODERATOR,
-    ROLE_ADMINISTRATOR
+
+@Data
+@NoArgsConstructor
+public class Address {
+
+    private String id;
+    private String country;
+    private String city;
+    private String zipCode;
+    private String streetName;
+    private int buildingNumber;
 }

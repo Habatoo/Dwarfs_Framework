@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models.Enums;
+package com.angrydwarfs.framework.exceptions;
 
-import com.angrydwarfs.framework.models.MainRole;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-/**
- * Перечень возможных ролей по доступу пользователя.
- * @see MainRole (таблица ролей).
- * @version 0.001
- * @author habatoo
- */
-public enum EMainRole {
-    ROLE_USER,
-    FACEBOOK_USER,
-    ROLE_MODERATOR,
-    ROLE_ADMINISTRATOR
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class ResourceNotFoundException extends RuntimeException {
+
+    public ResourceNotFoundException(String resource) {
+        super(String.format("Resource %s not found", resource));
+    }
 }
