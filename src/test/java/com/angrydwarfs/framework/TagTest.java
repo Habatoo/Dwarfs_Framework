@@ -111,7 +111,7 @@ public class TagTest {
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("message").value("Tags was added successfully!"));
 
-        User user = userRepository.findByUserName(username).get();
+        User user = userRepository.findByUsername(username).get();
         Assert.assertTrue(user.getTags().toString().contains("JOGGING"));
         Assert.assertTrue(user.getTags().toString().contains("FITNESS"));
         Assert.assertFalse(user.getTags().toString().contains("CROSSFIT"));
@@ -131,7 +131,7 @@ public class TagTest {
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("message").value("Tags was added successfully!"));
 
-        User user = userRepository.findByUserName("user").get();
+        User user = userRepository.findByUsername("user").get();
         Assert.assertTrue(user.getTags().toString().contains("JOGGING"));
         Assert.assertTrue(user.getTags().toString().contains("FITNESS"));
         Assert.assertFalse(user.getTags().toString().contains("CROSSFIT"));
@@ -145,7 +145,7 @@ public class TagTest {
         String tagName = "JOGGING";
         String tagLevel = "2";
 
-        User user = userRepository.findByUserName(username).get();
+        User user = userRepository.findByUsername(username).get();
         Set<Tag> tags = new HashSet<>();
         Tag tempTag = tagRepository.findByTagName(ETag.valueOf(tagName)).get();
         tempTag.setTagLevel(levelRepository.findByLevelName(ELevel.FIRST_LEVEL).get());
@@ -170,7 +170,7 @@ public class TagTest {
         tokenUtils.makeToken(username, jwtResponse.getToken());
         String tagName = "JOGGING";
 
-        User user = userRepository.findByUserName(username).get();
+        User user = userRepository.findByUsername(username).get();
         Set<Tag> tags = new HashSet<>();
         Tag tempTag = tagRepository.findByTagName(ETag.valueOf(tagName)).get();
         tempTag.setTagLevel(levelRepository.findByLevelName(ELevel.FIRST_LEVEL).get());

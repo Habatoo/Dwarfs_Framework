@@ -34,5 +34,9 @@ public enum ELevel {
     SEVENTH_LEVEL,
     EIGHTH_LEVEL,
     NINTH_LEVEL,
-    TENTH_LEVEL
+    TENTH_LEVEL;
+
+    public String getLevelName() {
+        return name();
+    }
 }

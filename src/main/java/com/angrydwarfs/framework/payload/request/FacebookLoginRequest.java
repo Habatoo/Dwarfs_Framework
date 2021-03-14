@@ -29,6 +29,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 public class FacebookLoginRequest implements Serializable {
+    private static final long serialVersionUID = -1399500801576919731L;
 
     @NotBlank
     private String accessToken;

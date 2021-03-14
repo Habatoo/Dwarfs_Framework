@@ -66,7 +66,7 @@ public class TokenUtils {
      * @param strToken - токен - генерируется из имени пользователя и пароля
      */
     public void makeToken(String userName, String strToken) {
-        Token token = new Token(strToken, userRepository.findByUserName(userName).get());
+        Token token = new Token(strToken, userRepository.findByUsername(userName).get());
         token.setActive(true);
         Date date = new Date();
         LocalDateTime createDate = Instant.ofEpochMilli(date.getTime())
@@ -78,7 +78,7 @@ public class TokenUtils {
         token.setCreationDate(createDate);
         token.setExpiryDate(expireDate);
 
-        token.setUserTokens(userRepository.findByUserName(userName).get());
+        token.setUserTokens(userRepository.findByUsername(userName).get());
         tokenRepository.save(token);
     }
 
@@ -105,13 +105,13 @@ public class TokenUtils {
                     .setExpiration(dateExpDate).signWith(SignatureAlgorithm.HS512, jwtSecret)
                     .compact();
 
-            Token token = new Token(jwt, userRepository.findByUserName(userName).get());
+            Token token = new Token(jwt, userRepository.findByUsername(userName).get());
             token.setActive(true);
 
             DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             token.setCreationDate(LocalDateTime.parse(strStartDate, formatter2));
             token.setExpiryDate(LocalDateTime.parse(strExpDate, formatter2));
-            token.setUserTokens(userRepository.findByUserName(userName).get());
+            token.setUserTokens(userRepository.findByUsername(userName).get());
             tokenRepository.save(token);
         } catch (Exception e) {
 

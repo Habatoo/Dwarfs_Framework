@@ -1,99 +1,151 @@
-///*
-// * Copyright 2021 the original author or authors.
-// *
-// * Licensed under the Apache License, Version 2.0 (the "License");
-// * you may not use this file except in compliance with the License.
-// * You may obtain a copy of the License at
-// *
-// *      https://www.apache.org/licenses/LICENSE-2.0
-// *
-// * Unless required by applicable law or agreed to in writing, software
-// * distributed under the License is distributed on an "AS IS" BASIS,
-// * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// * See the License for the specific language governing permissions and
-// * limitations under the License.
-// */
-//
-//package com.angrydwarfs.framework.service;
-//
-//import com.angrydwarfs.framework.exceptions.InternalServerException;
-//import com.angrydwarfs.framework.models.FacebookUser;
-//import com.angrydwarfs.framework.models.MainRole;
-//import com.angrydwarfs.framework.models.Profile;
-//import com.angrydwarfs.framework.models.User;
-//import com.angrydwarfs.framework.security.jwt.JwtUtils;
-//import com.angrydwarfs.framework.service.client.FacebookClient;
-//import lombok.var;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.Optional;
-//import java.util.Random;
-//
-//@Service
-//public class FacebookService {
-//    @Autowired
-//    private FacebookClient facebookClient;
-//    @Autowired
-//    private UserService userService;
-//    @Autowired
-//    private JwtUtils tokenProvider;
-//
-//    public String loginUser(String fbAccessToken) {
-////        var facebookUser = facebookClient.getUser(fbAccessToken);
-//        FacebookUser facebookUser = facebookClient.getUser(fbAccessToken);
-//
-////        var arrayList = new ArrayList<String>();
-////        ArrayList<String> arrayList = new ArrayList<>();
-//
-//        return userService(facebookUser.getId())
-//                .or(() -> Optional.ofNullable(userService.registerUser(convertTo(facebookUser), MainRole.FACEBOOK_USER)))
-//                .map(InstaUserDetails::new)
-//                .map(userDetails -> new UsernamePasswordAuthenticationToken(
-//                        userDetails, null, userDetails.getAuthorities()))
-//                .map(tokenProvider::generateJwtToken)
-//                .orElseThrow(() ->
-//                        new InternalServerException("unable to login facebook user id " + facebookUser.()));
-//    }
-//
-//    private User convertTo(FacebookUser facebookUser) {
-//        return User.builder()
-//                .id(new Long(facebookUser.getId()))
-//                .userEmail(facebookUser.getEmail())
-//                .userName(generateUsername(facebookUser.getFirstName(), facebookUser.getLastName()))
-//                .password(generatePassword(8))
-//                .userProfile(Profile.builder()
-//                        .displayName(String
-//                                .format("%s %s", facebookUser.getFirstName(), facebookUser.getLastName()))
-//                        //.profilePictureUrl(facebookUser.getPicture().getData().getUrl())
-//                        .build())
-//                .build();
-//    }
-//
-//    private String generateUsername(String firstName, String lastName) {
-//        Random rnd = new Random();
-//        int number = rnd.nextInt(999999);
-//
-//        return String.format("%s.%s.%06d", firstName, lastName, number);
-//    }
-//
-//    private String generatePassword(int length) {
-//        String capitalCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-//        String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
-//        String specialCharacters = "!@#$";
-//        String numbers = "1234567890";
-//        String combinedChars = capitalCaseLetters + lowerCaseLetters + specialCharacters + numbers;
-//        Random random = new Random();
-//        char[] password = new char[length];
-//
-//        password[0] = lowerCaseLetters.charAt(random.nextInt(lowerCaseLetters.length()));
-//        password[1] = capitalCaseLetters.charAt(random.nextInt(capitalCaseLetters.length()));
-//        password[2] = specialCharacters.charAt(random.nextInt(specialCharacters.length()));
-//        password[3] = numbers.charAt(random.nextInt(numbers.length()));
-//
-//        for(int i = 4; i< length ; i++) {
-//            password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
-//        }
-//        return new String(password);
-//    }
-//}
+/*
+ * Copyright 2021 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.angrydwarfs.framework.service;
+
+import com.angrydwarfs.framework.exceptions.InternalServerException;
+import com.angrydwarfs.framework.models.Enums.EMainRole;
+import com.angrydwarfs.framework.models.Enums.EStatus;
+import com.angrydwarfs.framework.models.Enums.ESubRole;
+import com.angrydwarfs.framework.models.*;
+import com.angrydwarfs.framework.payload.response.JwtResponse;
+import com.angrydwarfs.framework.repository.*;
+import com.angrydwarfs.framework.security.jwt.JwtUtils;
+import com.angrydwarfs.framework.security.jwt.TokenUtils;
+import com.angrydwarfs.framework.security.services.UserDetailsServiceImpl;
+import com.angrydwarfs.framework.service.client.FacebookClient;
+import lombok.var;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.*;
+
+@Service
+public class FacebookService {
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    private FacebookClient facebookClient;
+
+    @Autowired
+    MainRoleRepository mainRoleRepository;
+
+    @Autowired
+    StatusRepository statusRepository;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    SubRoleRepository subRoleRepository;
+
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    PasswordEncoder encoder;
+
+    @Autowired
+    TokenUtils tokenUtils;
+
+    @Autowired
+    TokenRepository tokenRepository;
+
+    public JwtResponse loginUser(String fbAccessToken) {
+//        var facebookUser = facebookClient.getUser(fbAccessToken);
+        //FacebookUser facebookUser = facebookClient.getUser(fbAccessToken);
+        var facebookUser = facebookClient.getUser(fbAccessToken);
+        //MainRole mainRole = mainRoleRepository.findByMainRoleName(EMainRole.ROLE_USER).get();
+
+        if (facebookUser.getId() != null) {
+            throw new InternalServerException("Unable to login facebook user id " + facebookUser.getFirstName() + " " + facebookUser.getLastName());
+        } else {
+            List newUserAndToken = convertTo(facebookUser);
+            User user = (User) newUserAndToken.get(0);
+            JwtResponse jwt =  (JwtResponse) newUserAndToken.get(1);
+
+            return jwt;
+        }
+    }
+
+    private List<Object> convertTo(FacebookUser facebookUser) {
+        // Create new user's account
+        String password = generatePassword(8);
+        User user = new User(
+                generateUsername(facebookUser.getFirstName(), facebookUser.getLastName()),
+                facebookUser.getEmail(),
+                encoder.encode(password)
+        );
+
+        Set<MainRole> roles = new HashSet<>();
+        MainRole userRole = mainRoleRepository.findByMainRoleName(EMainRole.ROLE_USER).get();
+        roles.add(userRole);
+        user.setMainRoles(roles);
+
+        Set<SubRole> subRoleSet = new HashSet<>();
+        subRoleSet.add(subRoleRepository.findBySubRoleName(ESubRole.COMMON_USER).get());
+        user.setSubRoles(subRoleSet);
+        user.setCreationDate(LocalDateTime.now());
+
+        Set<Status> statusSet = new HashSet<>();
+        statusSet.add(statusRepository.findByUserStatus(EStatus.COMMON).get());
+        user.setUserStatus(statusSet);
+        user.setStatusStartDate(LocalDateTime.now());
+        user.setStatusEndDate(null);
+        user.setSocialNetId(facebookUser.getId());
+
+        //tokenUtils.makeToken(user.getUsername(), password);
+        userRepository.save(user);
+        List<Object> newUserAndToken  = new ArrayList<>();
+        newUserAndToken.add(user);
+        newUserAndToken.add(tokenUtils.makeAuth(user.getUsername(), password));
+
+        return newUserAndToken;
+    }
+
+    private String generateUsername(String firstName, String lastName) {
+        Random rnd = new Random();
+        int number = rnd.nextInt(999999);
+
+        return String.format("%s.%s.%06d", firstName, lastName, number);
+    }
+
+    private String generatePassword(int length) {
+        String capitalCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
+        String specialCharacters = "!@#$";
+        String numbers = "1234567890";
+        String combinedChars = capitalCaseLetters + lowerCaseLetters + specialCharacters + numbers;
+        Random random = new Random();
+        char[] password = new char[length];
+
+        password[0] = lowerCaseLetters.charAt(random.nextInt(lowerCaseLetters.length()));
+        password[1] = capitalCaseLetters.charAt(random.nextInt(capitalCaseLetters.length()));
+        password[2] = specialCharacters.charAt(random.nextInt(specialCharacters.length()));
+        password[3] = numbers.charAt(random.nextInt(numbers.length()));
+
+        for(int i = 4; i< length ; i++) {
+            password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
+        }
+        return new String(password);
+    }
+}

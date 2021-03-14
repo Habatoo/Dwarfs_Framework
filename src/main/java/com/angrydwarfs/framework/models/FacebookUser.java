@@ -33,5 +33,5 @@ public class FacebookUser {
     @JsonProperty("last_name")
     private String lastName;
     private String email;
-    //private FacebookPicture picture;
+    private FacebookPicture picture;
 }

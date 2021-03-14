@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models.Enums;
+package com.angrydwarfs.framework.config;
 
-import com.angrydwarfs.framework.models.Tag;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * Перечень возможных тэгов пользователя по видам активностей
- * @see Tag (таблица тегов).
- * @version 0.001
- * @author habatoo
- */
-public enum ETag {
-    JOGGING,
-    FITNESS,
-    CROSSFIT;
+public class MvcConfig implements WebMvcConfigurer{
+    @Value("${upload.path}")
+    private String uploadPath;
 
-    public String getTagName() {
-        return name();
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/api/auth/img/**")
+                .addResourceLocations("file://" + uploadPath + "/");
     }
 }

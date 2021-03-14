@@ -76,16 +76,16 @@ public class UserTest {
     @Test
     @DisplayName("Проверяет создание нового пользователя USER.")
     public void createNewUser() {
-        User user = userRepository.findByUserName("user").get();
+        User user = userRepository.findByUsername("user").get();
         Set<Status> userStatus = new HashSet<>();
         userStatus.add(new Status(EStatus.READ_ONLY));
         user.setUserStatus(userStatus);
         user.setStatusStartDate(LocalDateTime.now());
         user.setStatusEndDate(null);
 
-        assertEquals("user", user.getUserName());
+        assertEquals("user", user.getUsername());
         assertEquals("user@user.com", user.getUserEmail());
-        assertEquals(false, user.isActivationEmailStatus());
+        assertEquals(false, user.getActivationEmailStatus());
         assertEquals(true, user.getUserStatus().toString().contains("READ_ONLY"));
         assertEquals(LocalDateTime.now().getYear(), user.getStatusStartDate().getYear());
         assertEquals(LocalDateTime.now().getMonth(), user.getStatusStartDate().getMonth());
@@ -96,16 +96,16 @@ public class UserTest {
     @Test
     @DisplayName("Проверяет создание нового пользователя MODERATOR.")
     public void createNewMod() {
-        User user = userRepository.findByUserName("mod").get();
+        User user = userRepository.findByUsername("mod").get();
         Set<Status> userStatus = new HashSet<>();
         userStatus.add(new Status(EStatus.COMMON));
         user.setUserStatus(userStatus);
         user.setStatusStartDate(LocalDateTime.now());
         user.setStatusEndDate(null);
 
-        assertEquals("mod", user.getUserName());
+        assertEquals("mod", user.getUsername());
         assertEquals("mod@mod.com", user.getUserEmail());
-        assertEquals(true, user.isActivationEmailStatus());
+        assertEquals(true, user.getActivationEmailStatus());
         assertEquals(true, user.getUserStatus().toString().contains("COMMON"));
         assertEquals(LocalDateTime.now().getYear(), user.getStatusStartDate().getYear());
         assertEquals(LocalDateTime.now().getMonth(), user.getStatusStartDate().getMonth());
@@ -116,16 +116,16 @@ public class UserTest {
     @Test
     @DisplayName("Проверяет создание нового пользователя ROLE_ADMINISTRATOR.")
     public void createNewAdmin() {
-        User user = userRepository.findByUserName("admin").get();
+        User user = userRepository.findByUsername("admin").get();
         Set<Status> userStatus = new HashSet<>();
         userStatus.add(new Status(EStatus.BAN));
         user.setUserStatus(userStatus);
         user.setStatusStartDate(LocalDateTime.now());
         user.setStatusEndDate(LocalDateTime.now().plusDays(1));
 
-        assertEquals("admin", user.getUserName());
+        assertEquals("admin", user.getUsername());
         assertEquals("admin@admin.com", user.getUserEmail());
-        assertEquals(true, user.isActivationEmailStatus());
+        assertEquals(true, user.getActivationEmailStatus());
         assertEquals(true, user.getUserStatus().toString().contains("BAN"));
         assertEquals(LocalDateTime.now().getYear(), user.getStatusStartDate().getYear());
         assertEquals(LocalDateTime.now().getMonth(), user.getStatusStartDate().getMonth());
@@ -138,8 +138,8 @@ public class UserTest {
     @Test
     @DisplayName("Проверяет создание токена для пользователя.")
     public void createUserToken() {
-        User user = userRepository.findByUserName(username).get();
-        JwtResponse jwtResponse = tokenUtils.makeAuth(user.getUserName(), password);
+        User user = userRepository.findByUsername(username).get();
+        JwtResponse jwtResponse = tokenUtils.makeAuth(user.getUsername(), password);
         tokenUtils.makeToken(username, jwtResponse.getToken());
 
         assertEquals(true, tokenRepository.existsByToken(jwtResponse.getToken()));
@@ -148,7 +148,7 @@ public class UserTest {
     @Test
     @DisplayName("Проверяет создание ролей для пользователя.")
     public void createUserMainRole() {
-        User user = userRepository.findByUserName(username).get();
+        User user = userRepository.findByUsername(username).get();
         Set<MainRole> mainRole = new HashSet<>();
         MainRole role_1 = new MainRole(EMainRole.ROLE_ADMINISTRATOR);
         role_1.setId(1);
@@ -169,7 +169,7 @@ public class UserTest {
     @Test
     @DisplayName("Проверяет создание суб ролей для пользователя.")
     public void createUserSubRole() {
-        User user = userRepository.findByUserName(username).get();
+        User user = userRepository.findByUsername(username).get();
         Set<SubRole> subRole = new HashSet<>();
         SubRole role_1 = new SubRole(ESubRole.COMMON_USER);
         role_1.setId(1);
@@ -190,7 +190,7 @@ public class UserTest {
     @Test
     @DisplayName("Проверяет создание тэгов для пользователя.")
     public void createUserTag() {
-        User user = userRepository.findByUserName(username).get();
+        User user = userRepository.findByUsername(username).get();
         Set<Tag> tag = new HashSet<>();
         Tag tag_1 = new Tag(ETag.FITNESS);
         tag_1.setId(new Integer(1));
@@ -217,7 +217,7 @@ public class UserTest {
     @Test
     @DisplayName("Проверяет изменение уровня тэга для пользователя.")
     public void changeUserTagLevel() {
-        User user = userRepository.findByUserName(username).get();
+        User user = userRepository.findByUsername(username).get();
         Set<Tag> tag = new HashSet<>();
         Tag tag_1 = new Tag(ETag.FITNESS);
         tag_1.setId(new Integer(1));
@@ -246,7 +246,7 @@ public class UserTest {
         this.mockMvc.perform(put("/api/auth/users/" + id)
                 .header("Authorization", "Bearer " + jwtResponse.getToken())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"userName\": \"admin2\", \"userEmail\": \"admin2@admin2.com\", \"password\": \"12345\" }"))
+                .content("{ \"username\": \"admin2\", \"userEmail\": \"admin2@admin2.com\", \"password\": \"12345\" }"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("message").value("User data was update successfully!"));
 
@@ -262,7 +262,7 @@ public class UserTest {
         this.mockMvc.perform(put("/api/auth/users/" + id)
                 .header("Authorization", "Bearer " + jwtResponse.getToken())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"userName\": \"user2\", \"userEmail\": \"user2@user2.com\", \"password\": \"12345\" }"))
+                .content("{ \"username\": \"user2\", \"userEmail\": \"user2@user2.com\", \"password\": \"12345\" }"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("message").value("User data was update successfully!"));
     }
@@ -276,7 +276,7 @@ public class UserTest {
         this.mockMvc.perform(put("/api/auth/users/3")
                 .header("Authorization", "Bearer " + jwtResponse.getToken())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"userName\": \"user2\", \"userEmail\": \"user2@user2.com\", \"password\": \"12345\" }"))
+                .content("{ \"username\": \"user2\", \"userEmail\": \"user2@user2.com\", \"password\": \"12345\" }"))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("message").value("User data was update successfully!"));
 
@@ -346,7 +346,7 @@ public class UserTest {
         this.mockMvc.perform(get("/api/auth/users/getUserInfo")
                 .header("Authorization", "Bearer " + jwtResponse.getToken()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("userName").value("admin"))
+                .andExpect(jsonPath("username").value("admin"))
                 .andExpect(jsonPath("userEmail").value("admin@admin.com"))
                 .andExpect(jsonPath("userLocale").isEmpty())
                 .andExpect(jsonPath("activationEmailStatus").value(true))
@@ -384,4 +384,16 @@ public class UserTest {
         Assert.assertEquals(1, tokenRepository.findAll().size());
     }
 
+    @Test
+    @DisplayName("Проверяет отображение списка авторизаций пользователя ADMIN.")
+    public void testShowAllUsersRoles() {
+        JwtResponse jwtResponse = tokenUtils.makeAuth(username, password);
+        tokenUtils.makeToken(username, jwtResponse.getToken());
+
+        User user = userRepository.findByUsername(username).get();
+        Assert.assertTrue(user.getAuthorities().toString().contains("ROLE_ADMINISTRATOR"));
+        Assert.assertTrue(user.getAuthorities().toString().contains("ROLE_MODERATOR"));
+        Assert.assertTrue(user.getAuthorities().toString().contains("ROLE_USER"));
+
+    }
 }

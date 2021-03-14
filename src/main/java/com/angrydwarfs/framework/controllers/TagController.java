@@ -88,7 +88,7 @@ public class TagController {
             @RequestBody UserEditRequest userEditRequest,
             Authentication authentication) {
 
-        User user = userRepository.findByUserName(authentication.getName()).get();
+        User user = userRepository.findByUsername(authentication.getName()).get();
         Set<Tag> tags = new HashSet<>();
         Set<String> strTags = userEditRequest.getTags();
         if (strTags != null) {
@@ -108,7 +108,7 @@ public class TagController {
      * @method changeUserTagsLevel - при http PUT запросе по адресу .../changeUserTagsLevel/{tag_name}/{tag_level} изменяет уровень тэга для пользователя
      * @param tagName - имя тэга
      * @param tagLevel - новый уровень тэга
-     * @param userName - данные пользователя для изменения
+     * @param username - данные пользователя для изменения
      * @return
      */
     @PutMapping("/changeUserTagsLevel/{username}/{tag_name}/{tag_level}")
@@ -116,9 +116,9 @@ public class TagController {
     public ResponseEntity<?> setUserTagsLevel(
             @PathVariable("tag_name") String tagName,
             @PathVariable("tag_level") String tagLevel,
-            @PathVariable("username") String userName) {
+            @PathVariable("username") String username) {
 
-        User user = userRepository.findByUserName(userName).get();
+        User user = userRepository.findByUsername(username).get();
         Set<Tag> tags = new HashSet<>();
 
         try {
@@ -139,8 +139,8 @@ public class TagController {
     @PreAuthorize("hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR') or hasRole('ROLE_USER')")
     public ResponseEntity<?> deleteTag(
             @PathVariable("tag_name") String tagName,
-            @PathVariable("username") String userName) {
-        User user = userRepository.findByUserName(userName).get();
+            @PathVariable("username") String username) {
+        User user = userRepository.findByUsername(username).get();
 
         try {
             Tag tempTag = tagRepository.findByTagName(ETag.valueOf(tagName)).get();

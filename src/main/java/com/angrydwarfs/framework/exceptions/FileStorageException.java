@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models.Enums;
+package com.angrydwarfs.framework.exceptions;
 
-import com.angrydwarfs.framework.models.Tag;
+public class FileStorageException extends RuntimeException{
 
-/**
- * Перечень возможных тэгов пользователя по видам активностей
- * @see Tag (таблица тегов).
- * @version 0.001
- * @author habatoo
- */
-public enum ETag {
-    JOGGING,
-    FITNESS,
-    CROSSFIT;
-
-    public String getTagName() {
-        return name();
+    public FileStorageException(String message) {
+        super(message);
     }
 }

@@ -28,5 +28,9 @@ import com.angrydwarfs.framework.models.SubRole;
 public enum ESubRole {
     COMMON_USER,
     SILVER_USER,
-    GOLD_USER
+    GOLD_USER;
+
+    public String getSubRoleName() {
+        return name();
+    }
 }

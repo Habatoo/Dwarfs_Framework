@@ -45,7 +45,7 @@ public class UserUtils {
      * @param userFromDb - данные пользователя с дб
      */
     public ResponseEntity<?>  checkUserNameAndEmail(User user, User userFromDb) {
-        if (!(user.getUserName().equals(userFromDb.getUserName())) & (userRepository.existsByUserName(user.getUserName()))) {
+        if (!(user.getUsername().equals(userFromDb.getUsername())) & (userRepository.existsByUsername(user.getUsername()))) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Username is already taken!"));
@@ -57,7 +57,7 @@ public class UserUtils {
                     .body(new MessageResponse("Error: Email is already in use!"));
         }
 
-        userFromDb.setUserName(user.getUserName());
+        userFromDb.setUsername(user.getUsername());
         userFromDb.setUserEmail(user.getUserEmail());
         userFromDb.setPassword(encoder.encode(user.getPassword()));
 
@@ -74,8 +74,8 @@ public class UserUtils {
      */
     public ResponseEntity<?>  checkRegisterUserNameAndEmail(User user) {
 
-        if (userRepository.existsByUserName(
-                user.getUserName()
+        if (userRepository.existsByUsername(
+                user.getUsername()
         )) {
             return ResponseEntity
                     .badRequest()

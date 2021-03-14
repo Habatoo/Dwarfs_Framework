@@ -121,6 +121,9 @@ public class Activity implements Serializable {
     @JsonView(Views.UserShortData.class)
     private Set<Tag> tags = new HashSet<>();
 
+    //////////////// image files
+    private String activityFileName;
+
     public Activity(String activityTitle, String activityDescription, User user) {
         this.activityTitle = activityTitle;
         this.activityDescription = activityDescription;

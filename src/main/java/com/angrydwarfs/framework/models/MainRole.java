@@ -20,6 +20,7 @@ import com.angrydwarfs.framework.models.Enums.EMainRole;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 
@@ -38,7 +39,7 @@ import javax.persistence.*;
 @Table(name = "MAIN_ROLES")
 @ToString(of = {"id", "mainRoleName"})
 @EqualsAndHashCode(of = {"id"})
-public class MainRole {
+public class MainRole implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="MAIN_ROLE_ID")
@@ -56,4 +57,8 @@ public class MainRole {
         this.mainRoleName = mainRoleName;
     }
 
+    @Override
+    public String getAuthority() {
+        return mainRoleName.getAuthority();
+    }
 }

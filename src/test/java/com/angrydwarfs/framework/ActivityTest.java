@@ -137,7 +137,7 @@ public class ActivityTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(content().string("[{\"activityTitle\":\"First activity\",\"activityDescription\":\"First user body activity FIRST\",\"latitude\":null,\"longitude\":null,\"activityAddress\":null,\"creationDate\":\"" + date + "\",\"dateOfActivity\":null,\"userActivities\":{\"userName\":\"admin\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]},{\"activityTitle\":\"Second activity\",\"activityDescription\":\"First user body activity SECOND\",\"latitude\":null,\"longitude\":null,\"activityAddress\":null,\"creationDate\":\"" + date + "\",\"dateOfActivity\":null,\"userActivities\":{\"userName\":\"admin\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]}]"));
+                .andExpect(content().string("[{\"activityTitle\":\"First activity\",\"activityDescription\":\"First user body activity FIRST\",\"latitude\":null,\"longitude\":null,\"activityAddress\":null,\"creationDate\":\"" + date + "\",\"dateOfActivity\":null,\"userActivities\":{\"username\":\"admin\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]},{\"activityTitle\":\"Second activity\",\"activityDescription\":\"First user body activity SECOND\",\"latitude\":null,\"longitude\":null,\"activityAddress\":null,\"creationDate\":\"" + date + "\",\"dateOfActivity\":null,\"userActivities\":{\"username\":\"admin\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]}]"));
     }
 
     @Test
@@ -153,7 +153,7 @@ public class ActivityTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(content().string("[{\"activityTitle\":\"Fourth activity\",\"activityDescription\":\"Third user body activity FOURTH\",\"latitude\":null,\"longitude\":null,\"activityAddress\":null,\"creationDate\":\"" + date + "\",\"dateOfActivity\":null,\"userActivities\":{\"userName\":\"user\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]}]"));
+                .andExpect(content().string("[{\"activityTitle\":\"Fourth activity\",\"activityDescription\":\"Third user body activity FOURTH\",\"latitude\":null,\"longitude\":null,\"activityAddress\":null,\"creationDate\":\"" + date + "\",\"dateOfActivity\":null,\"userActivities\":{\"username\":\"user\",\"creationDate\":\"" + date + "\",\"lastVisitedDate\":null,\"userStatus\":[]},\"tags\":[]}]"));
     }
 
     @Test
@@ -380,7 +380,7 @@ public class ActivityTest {
     }
 
     private User commonUser(String username) {
-        User user = userRepository.findByUserName(username).get();
+        User user = userRepository.findByUsername(username).get();
         Set<Status> userStatus = new HashSet<>();
         userStatus.add(new Status(EStatus.COMMON));
         user.setUserStatus(userStatus);

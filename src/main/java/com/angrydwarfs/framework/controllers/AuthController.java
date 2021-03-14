@@ -20,6 +20,7 @@ import com.angrydwarfs.framework.models.*;
 import com.angrydwarfs.framework.models.Enums.EMainRole;
 import com.angrydwarfs.framework.models.Enums.EStatus;
 import com.angrydwarfs.framework.models.Enums.ESubRole;
+import com.angrydwarfs.framework.payload.request.FacebookLoginRequest;
 import com.angrydwarfs.framework.payload.request.LoginRequest;
 import com.angrydwarfs.framework.payload.request.SignupRequest;
 import com.angrydwarfs.framework.payload.response.JwtResponse;
@@ -27,6 +28,7 @@ import com.angrydwarfs.framework.payload.response.MessageResponse;
 import com.angrydwarfs.framework.repository.*;
 import com.angrydwarfs.framework.security.jwt.TokenUtils;
 import com.angrydwarfs.framework.security.jwt.UserUtils;
+import com.angrydwarfs.framework.service.FacebookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -74,6 +76,9 @@ public class AuthController {
     @Autowired
     UserUtils userUtils;
 
+    @Autowired
+    FacebookService facebookService;
+
     @Value("${dwarfsframework.app.secretKey}")
     private String secretKey;
 
@@ -95,7 +100,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest, HttpServletRequest request) {
 
-        if (userRepository.existsByUserName(
+        if (userRepository.existsByUsername(
                 signUpRequest.getUserName()
         )) {
             return ResponseEntity
@@ -172,9 +177,9 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        JwtResponse jwtResponse = tokenUtils.makeAuth(loginRequest.getUserName(),  loginRequest.getPassword());
+        JwtResponse jwtResponse = tokenUtils.makeAuth(loginRequest.getUserName(), loginRequest.getPassword());
         tokenUtils.makeToken(loginRequest.getUserName(), jwtResponse.getToken());
-        User user = userRepository.findByUserName(loginRequest.getUserName()).get();
+        User user = userRepository.findByUsername(loginRequest.getUserName()).get();
         user.setLastVisitedDate(LocalDateTime.now());
         userRepository.save(user);
         return ResponseEntity.ok(jwtResponse);
@@ -200,6 +205,21 @@ public class AuthController {
         return ResponseEntity
                 .badRequest()
                 .body(new MessageResponse("You are logout."));
+    }
+
+    /**
+     * @method authenticateUser - при http post запросе по адресу .../api/auth/login
+     * @param facebookLoginRequest - запрос на доступ с параметрами пользователя facebook по facebook Id.
+     * возвращает
+     * @return {@code ResponseEntity ответ}
+     * @see FacebookLoginRequest
+     */
+    @PostMapping("/facebook")
+    public  ResponseEntity<?> facebookAuth(@Valid @RequestBody FacebookLoginRequest facebookLoginRequest) {
+        //log.info("facebook login {}", facebookLoginRequest);
+        JwtResponse jwtResponse = facebookService.loginUser(facebookLoginRequest.getAccessToken());
+
+        return ResponseEntity.ok(jwtResponse);
     }
 
 //    /**

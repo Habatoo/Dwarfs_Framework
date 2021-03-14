@@ -29,5 +29,9 @@ public enum EStatus {
     READ_ONLY,
     NO_ACTIVITY,
     BAN,
-    CLEAR
+    CLEAR;
+
+    public String getStatusName() {
+        return name();
+    }
 }

@@ -75,7 +75,7 @@ public class SubscriptionController {
             //@AuthenticationPrincipal User subscriber,
             @PathVariable("channelId") User channel
     ) {
-        Optional optionalUser = userRepository.findByUserName(authentication.getName());
+        Optional optionalUser = userRepository.findByUsername(authentication.getName());
         if (optionalUser.isPresent()) {
             if (optionalUser.get().equals(channel)) {
                 return channel;

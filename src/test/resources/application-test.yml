@@ -30,3 +30,6 @@ dwarfsframework:
     jwtExpirationMs: 172800000
     secretKey: 1234567890
     remoteAddr: 0:0:0:0:0:0:0:1
+
+upload:
+  path: ${filesPath}

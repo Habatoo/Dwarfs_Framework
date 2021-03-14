@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models.Enums;
+package com.angrydwarfs.framework.payload.response;
 
-import com.angrydwarfs.framework.models.Tag;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-/**
- * Перечень возможных тэгов пользователя по видам активностей
- * @see Tag (таблица тегов).
- * @version 0.001
- * @author habatoo
- */
-public enum ETag {
-    JOGGING,
-    FITNESS,
-    CROSSFIT;
+@Data
+@AllArgsConstructor
+public class ApiResponse {
 
-    public String getTagName() {
-        return name();
-    }
+    private Boolean success;
+    private String message;
 }

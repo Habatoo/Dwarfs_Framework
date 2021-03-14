@@ -94,7 +94,7 @@ public class UserController {
             temp.put("roles", user.getMainRoles());
             temp.put("creationDate", user.getCreationDate());
             temp.put("userEmail", user.getUserEmail());
-            temp.put("userName", user.getUserName());
+            temp.put("userName", user.getUsername());
             temp.put("id", user.getId());
             usersReturn.add(temp);
         }
@@ -113,7 +113,7 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMINISTRATOR') or hasRole('ROLE_MODERATOR')")
     @ResponseBody
     public ResponseEntity<?>  getUserInfo(Authentication authentication) {
-        Optional optionalUser = userRepository.findByUserName(authentication.getName());
+        Optional optionalUser = userRepository.findByUsername(authentication.getName());
         if(optionalUser.isPresent()) {
             return ResponseEntity.ok(optionalUser.get());
         }
@@ -140,9 +140,9 @@ public class UserController {
 
         userFromDb = userRepository.findById(userFromDb.getId()).get();
         // check ID current user = ID edit user
-        if(!(userFromDb.getId() == userRepository.findByUserName(authentication.getName()).get().getId())) {
+        if(!(userFromDb.getId() == userRepository.findByUsername(authentication.getName()).get().getId())) {
             // admin check
-            if(userRepository.findByUserName(authentication.getName()).get().getMainRoles().size() == 3) {
+            if(userRepository.findByUsername(authentication.getName()).get().getMainRoles().size() == 3) {
                 return userUtils.checkUserNameAndEmail(user, userFromDb);
             }
             return ResponseEntity

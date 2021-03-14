@@ -13,23 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.angrydwarfs.framework.models.Enums;
-
-import com.angrydwarfs.framework.models.Tag;
-
-/**
- * Перечень возможных тэгов пользователя по видам активностей
- * @see Tag (таблица тегов).
- * @version 0.001
- * @author habatoo
- */
-public enum ETag {
-    JOGGING,
-    FITNESS,
-    CROSSFIT;
-
-    public String getTagName() {
-        return name();
-    }
+ 
+#parse("File Header.java")
+module #[[$MODULE_NAME$]]# {
 }

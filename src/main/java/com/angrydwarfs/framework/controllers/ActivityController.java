@@ -90,14 +90,14 @@ public class ActivityController {
     @JsonView(Views.UserShortData.class)
     public ResponseEntity<?> userActivityList(Authentication authentication) {
 
-        Optional optionalUser = userRepository.findByUserName(authentication.getName());
+        Optional optionalUser = userRepository.findByUsername(authentication.getName());
         if(!optionalUser.isPresent()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: can not find user data."));
         }
 
-        return ResponseEntity.ok(activityRepository.findByUserActivities(userRepository.findByUserName(authentication.getName()).get()));
+        return ResponseEntity.ok(activityRepository.findByUserActivities(userRepository.findByUsername(authentication.getName()).get()));
     }
 
     /**
@@ -124,7 +124,7 @@ public class ActivityController {
             @Valid @RequestBody ActivityRequest activityRequest,
             Authentication authentication) {
 
-        User user = userRepository.findByUserName(authentication.getName()).get();
+        User user = userRepository.findByUsername(authentication.getName()).get();
         Activity activity = new Activity(activityRequest.getActivityTitle(), activityRequest.getActivityBody(), user);
         activity.setCreationDate(activityRequest.getCreationDate());
 
@@ -164,9 +164,9 @@ public class ActivityController {
 
         activityFromDb = activityRepository.findById(activityFromDb.getId()).get();
         // check ID current user = ID edit user
-        if(!(authentication.getName().equals(activityFromDb.getUserActivities().getUserName()))) {
+        if(!(authentication.getName().equals(activityFromDb.getUserActivities().getUsername()))) {
             // admin check
-            if(userRepository.findByUserName(authentication.getName()).get().getMainRoles().size() >= 3) {
+            if(userRepository.findByUsername(authentication.getName()).get().getMainRoles().size() >= 3) {
                 //BeanUtils.copyProperties(activity, activityFromDb, "id");
                 activityFromDb.setActivityTitle(activity.getActivityTitle());
                 activityFromDb.setActivityDescription(activity.getActivityDescription());
@@ -197,9 +197,9 @@ public class ActivityController {
     public ResponseEntity<?>  deleteUser(@PathVariable("id") Activity activity, Authentication authentication) {
 
         // check ID current user = ID edit user
-        if(!(authentication.getName().equals(activity.getUserActivities().getUserName()))) {
+        if(!(authentication.getName().equals(activity.getUserActivities().getUsername()))) {
             // admin check
-            if(userRepository.findByUserName(authentication.getName()).get().getMainRoles().size() >= 3) {
+            if(userRepository.findByUsername(authentication.getName()).get().getMainRoles().size() >= 3) {
                 try {
                     activityRepository.delete(activity);
                     return ResponseEntity.ok(new MessageResponse("Activity was deleted successfully!"));

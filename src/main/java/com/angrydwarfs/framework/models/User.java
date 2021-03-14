@@ -18,15 +18,17 @@ package com.angrydwarfs.framework.models;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Objects;
 
 /**
  * Модель пользователя. Записывается в БД в таблицу с имененм users.
@@ -34,7 +36,7 @@ import java.util.Objects;
  * @author habatoo
  *
  * @param "id" - primary key таблицы users.
- * @param "userName" - имя пользователя - предпоалагается строковоя переменная Имя + Фамилия.
+ * @param "username" - имя пользователя - предпоалагается строковоя переменная Имя + Фамилия.
  * @param "password" - пароль, в БД хранится в виде хешированном виде.
  * @param "userEmail" - email пользователя.
  * @param "creationDate" - дата создания пользователя.
@@ -57,9 +59,8 @@ import java.util.Objects;
 @Table(name = "USR")
 @ToString(of = {"id", "userName", "password", "userEmail", "creationDate", "activationStatus"})
 @EqualsAndHashCode(of = {"id"})
-public class User implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class User implements Serializable, UserDetails {
+    private static final long serialVersionUID = -1399500801576919731L;
 
     @Id
     @Column(name="USER_ID")
@@ -75,7 +76,7 @@ public class User implements Serializable {
     @NotBlank(message = "Username cannot be empty")
     @Column(name="USER_NAME", length = 100, nullable = false)
     @JsonView(Views.UserShortData.class)
-    private String userName;
+    private String username;
 
     @NotBlank(message = "Password cannot be empty")
     @Column(name="USER_PASSWORD", length = 100)
@@ -206,17 +207,20 @@ public class User implements Serializable {
     //////////////////////////////
 //    private Profile userProfile;
 
+    //////////////// image files
+    private String avatarFileName;
+
     /**
      * Конструктор для создания пользователя.
-     * @param userName - имя пользователя - предпоалагается строковоя переменная Имя + Фамилия.
+     * @param username - имя пользователя - предпоалагается строковоя переменная Имя + Фамилия.
      * @param userEmail - email пользователя.
      * @param password - пароль, в БД хранится в виде хешированном виде.
      * activationStatus - поле подтверждения email пользователя.
      * userStatus - поле статуса пользователя на возможность чтения и записи и доступа к аккаунту
      *
      */
-    public User(String userName, String userEmail, String password) {
-        this.userName = userName;
+    public User(String username, String userEmail, String password) {
+        this.username = username;
         this.userEmail = userEmail;
         this.password = password;
         this.activationEmailStatus = false;
@@ -234,7 +238,6 @@ public class User implements Serializable {
         } else if (!id.equals(user.id))
             return false;
         return true;
-        //return Objects.equals(id, user.id);
     }
 
     @Override
@@ -243,35 +246,41 @@ public class User implements Serializable {
         int result = 1;
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         return result;
-        //return Objects.hash(id);
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return getMainRoles();
+    }
 
+    @Override
+    public String getUsername() {
+        return username;
+    }
 
-//    @Override
-//    public boolean isAccountNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isCredentialsNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isEnabled() {
-//        return isActive();
-//    }
-//
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return getRoles();
-//    }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return getActivationEmailStatus();
+    }
+
+    public boolean getActivationEmailStatus() {
+        return activationEmailStatus;
+    }
 
 }
 
