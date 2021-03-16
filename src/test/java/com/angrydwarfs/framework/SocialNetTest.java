@@ -17,6 +17,7 @@
 package com.angrydwarfs.framework;
 
 import com.angrydwarfs.framework.controllers.AuthController;
+import com.angrydwarfs.framework.controllers.SocialNetController;
 import com.angrydwarfs.framework.controllers.UserController;
 import com.angrydwarfs.framework.payload.request.FacebookLoginRequest;
 import com.angrydwarfs.framework.payload.response.JwtResponse;
@@ -66,31 +67,19 @@ public class SocialNetTest {
     private UserController userController;
 
     @Autowired
-    TokenUtils tokenUtils;
+    private TokenUtils tokenUtils;
 
     @Autowired
     private AuthController authController;
 
     @Autowired
-    FacebookClient facebookClient;
-
-    @Autowired
-    FacebookService facebookService;
-
-    @Autowired
-    FacebookLoginRequest facebookLoginRequest;
+    private SocialNetController socialNetController;
 
     @Value("${dwarfsframework.app.jwtSecret}")
     private String jwtSecret;
 
     @Value("${dwarfsframework.app.jwtExpirationMs}")
     private int jwtExpirationMs;
-
-    @Value("${security.oauth2.client.registration.facebook.client-id}")
-    private int facebookClientId;
-
-    @Value("${security.oauth2.client.registration.facebook.client-secret}")
-    private int facebookClientSecret;
 
     String username = "admin";
     String password = "12345";
@@ -102,26 +91,10 @@ public class SocialNetTest {
         tokenUtils.makeToken(username, jwtResponse.getToken());
     }
 
-//    @Test
-//    @DisplayName("Проверяет успешную подгрузку контроллера из контекста.")
-//    public void loadControllers() {
-//        //assertThat(authController).isNotNull();
-//        //assertThat(facebookClient).isNotNull();
-//        System.out.println("SocialNetTest.loadControllers " + facebookLoginRequest.getAccessToken());
-//    }
-//
     @Test
-    @DisplayName("Проверяет текущие подписки у пользователя ADMIN.")
-    public void testSubscriptionInUserInfo() throws Exception{
-        String id = "1";
-
-        this.mockMvc.perform(get("/api/auth/facebook")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"userName\": \"testmod\" }"))
-                .andDo(print());
-//                .andExpect(status().isOk())
-//                .andExpect((jsonPath("subscriptions", Matchers.empty())))
-//                .andExpect((jsonPath("subscribers", Matchers.empty())));
+    @DisplayName("Проверяет успешную подгрузку контроллера из контекста.")
+    public void loadControllers() {
+        assertThat(socialNetController).isNotNull();
     }
 
 }

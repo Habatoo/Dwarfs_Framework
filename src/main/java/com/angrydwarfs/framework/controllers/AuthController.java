@@ -207,21 +207,6 @@ public class AuthController {
                 .body(new MessageResponse("You are logout."));
     }
 
-    /**
-     * @method authenticateUser - при http post запросе по адресу .../api/auth/login
-     * @param facebookLoginRequest - запрос на доступ с параметрами пользователя facebook по facebook Id.
-     * возвращает
-     * @return {@code ResponseEntity ответ}
-     * @see FacebookLoginRequest
-     */
-    @PostMapping("/facebook")
-    public  ResponseEntity<?> facebookAuth(@Valid @RequestBody FacebookLoginRequest facebookLoginRequest) {
-        //log.info("facebook login {}", facebookLoginRequest);
-        JwtResponse jwtResponse = facebookService.loginUser(facebookLoginRequest.getAccessToken());
-
-        return ResponseEntity.ok(jwtResponse);
-    }
-
 //    /**
 //     * @method resetPassword - при http post запросе по адресу .../api/auth/reset
 //     * @param passwordRequest - запрос на сброс пароля с параметрами user login+sekretKey (хранится в env).

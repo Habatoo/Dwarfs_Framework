@@ -109,7 +109,7 @@ public class ActivityTest {
     public void showAllActivitiesFromDb() {
         User user = commonUser(username);
         List<Activity> activityList = activityRepository.findByUserActivities(user);
-        System.out.println("ActivityTest.createNewActivity " + activityRepository.findByUserActivities(user));
+        //System.out.println("ActivityTest.createNewActivity " + activityRepository.findByUserActivities(user));
 
         assertEquals("First activity", activityList.get(0).getActivityTitle());
         assertEquals("First user body activity FIRST", activityList.get(0).getActivityDescription());

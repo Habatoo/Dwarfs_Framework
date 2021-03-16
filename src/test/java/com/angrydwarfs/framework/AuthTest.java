@@ -152,7 +152,7 @@ public class AuthTest {
     public void testCreateEmailInDb() throws Exception{
         this.mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"userName\": \"admin2\", \"email\": \"admin@admin.com\", \"password\": \"12345\", \"role\": [\"admin\"] }"))
+                .content("{ \"username\": \"admin2\", \"email\": \"admin@admin.com\", \"password\": \"12345\", \"role\": [\"admin\"] }"))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("message").value("Error: Email is already in use!"));
     }

@@ -71,10 +71,7 @@ public class FacebookService {
     TokenRepository tokenRepository;
 
     public JwtResponse loginUser(String fbAccessToken) {
-//        var facebookUser = facebookClient.getUser(fbAccessToken);
-        //FacebookUser facebookUser = facebookClient.getUser(fbAccessToken);
         var facebookUser = facebookClient.getUser(fbAccessToken);
-        //MainRole mainRole = mainRoleRepository.findByMainRoleName(EMainRole.ROLE_USER).get();
 
         if (facebookUser.getId() != null) {
             throw new InternalServerException("Unable to login facebook user id " + facebookUser.getFirstName() + " " + facebookUser.getLastName());
@@ -113,7 +110,6 @@ public class FacebookService {
         user.setStatusEndDate(null);
         user.setSocialNetId(facebookUser.getId());
 
-        //tokenUtils.makeToken(user.getUsername(), password);
         userRepository.save(user);
         List<Object> newUserAndToken  = new ArrayList<>();
         newUserAndToken.add(user);

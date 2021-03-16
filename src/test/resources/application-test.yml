@@ -33,3 +33,31 @@ dwarfsframework:
 
 upload:
   path: ${filesPath}
+
+facebook:
+  client:
+    clientId: 779511356240542
+    clientSecret: ${clientFacebookSecret}
+    accessTokenUri: https://graph.facebook.com/oauth/access_token
+    userAuthorizationUri: https://www.facebook.com/dialog/oauth
+    tokenName: oauth_token
+    authenticationScheme: query
+    clientAuthenticationScheme: form
+  resource:
+    userInfoUri: https://graph.facebook.com/me
+google:
+  client:
+    clientId: 235455713239-gsfitturkangkseqjpfg5cese4atlket.apps.googleusercontent.com
+    clientSecret: ${clientGoogleSecret}
+    accessTokenUri: https://www.googleapis.com/oauth2/v4/token
+    userAuthorizationUri: https://accounts.google.com/o/oauth2/v2/auth
+    tokenName: oauth_token
+    authenticationScheme: query
+    clientAuthenticationScheme: form
+    scope:
+      - openid
+      - email
+      - profile
+  resource:
+    userInfoUri:  https://www.googleapis.com/oauth2/v3/userinfo
+    preferTokenInfo: true

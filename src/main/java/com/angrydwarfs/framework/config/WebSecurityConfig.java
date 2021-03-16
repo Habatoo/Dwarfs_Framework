@@ -22,6 +22,9 @@ import com.angrydwarfs.framework.security.jwt.AuthEntryPointJwt;
 import com.angrydwarfs.framework.security.jwt.AuthTokenFilter;
 import com.angrydwarfs.framework.security.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -34,14 +37,37 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CompositeFilter;
 import org.springframework.web.filter.CorsFilter;
 
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.PrincipalExtractor;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
+
+import javax.servlet.Filter;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+
+//@SpringBootApplication
+//@EnableOAuth2Client
+@RestController
+//@EnableResourceServer
 
 @Configuration
 @EnableWebSecurity
@@ -50,6 +76,9 @@ import java.time.LocalDateTime;
         // jsr250Enabled = true,
         prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+//    @Autowired
+//    OAuth2ClientContext oauth2ClientContext;
+
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
@@ -111,7 +140,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/auth/facebook").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/social").permitAll()
                 .antMatchers(HttpMethod.POST, "/users").anonymous()
                 .anyRequest().authenticated();
     }
@@ -131,6 +160,78 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 //    }
 
+/////////////
+///// Oauth2
+/////////////
 
+//    private OAuth2ClientAuthenticationProcessingFilter makeNetFilter(String socialNet) {
+//        AuthorizationCodeResourceDetails authorizationCodeResourceDetails;
+//        ResourceServerProperties resourceServerProperties;
+//
+//        OAuth2ClientAuthenticationProcessingFilter netFilter = new OAuth2ClientAuthenticationProcessingFilter(
+//                "/connect/" + socialNet);
+//        if(socialNet == "facebook") {
+//            authorizationCodeResourceDetails = facebook();
+//            resourceServerProperties = facebookResource();
+//        } else if (socialNet == "google") {
+//            authorizationCodeResourceDetails = google();
+//            resourceServerProperties = googleResource();
+//        } else { return null; }
+//        OAuth2RestTemplate netTemplate = new OAuth2RestTemplate(authorizationCodeResourceDetails, oauth2ClientContext);
+//        netFilter.setRestTemplate(netTemplate);
+//        UserInfoTokenServices tokenServices = new UserInfoTokenServices(resourceServerProperties.getUserInfoUri(),
+//                facebook().getClientId());
+//        tokenServices.setRestTemplate(netTemplate);
+//        netFilter.setTokenServices(tokenServices);
+//
+//        System.out.println("Oauth2SecurityConfig.makeNetFilter " + netFilter);
+//
+//        return netFilter;
+//    }
+//
+//    private Filter ssoFilter() {
+//        CompositeFilter filter = new CompositeFilter();
+//        List<Filter> filters = new ArrayList<>();
+//
+//        OAuth2ClientAuthenticationProcessingFilter facebookFilter = makeNetFilter("facebook");
+//        OAuth2ClientAuthenticationProcessingFilter googleFilter = makeNetFilter("google");
+//        filters.add(facebookFilter);
+//        filters.add(googleFilter);
+//        filter.setFilters(filters);
+//
+//        return filter;
+//    }
+//
+//    @Bean
+//    @ConfigurationProperties("facebook.client")
+//    public AuthorizationCodeResourceDetails facebook() {
+//        return new AuthorizationCodeResourceDetails();
+//    }
+//
+//    @Bean
+//    @ConfigurationProperties("facebook.resource")
+//    public ResourceServerProperties facebookResource() {
+//        return new ResourceServerProperties();
+//    }
+//
+//    @Bean
+//    @ConfigurationProperties("google.client")
+//    public AuthorizationCodeResourceDetails google() {
+//        return new AuthorizationCodeResourceDetails();
+//    }
+//
+//    @Bean
+//    @ConfigurationProperties("google.resource")
+//    public ResourceServerProperties googleResource() {
+//        return new ResourceServerProperties();
+//    }
+//
+//    @Bean
+//    public FilterRegistrationBean oauth2ClientFilterRegistration(OAuth2ClientContextFilter filter) {
+//        FilterRegistrationBean registration = new FilterRegistrationBean();
+//        registration.setFilter(filter);
+//        registration.setOrder(-100);
+//        return registration;
+//    }
 
 }
