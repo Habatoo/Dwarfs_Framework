@@ -20,7 +20,7 @@ package com.angrydwarfs.framework.exceptions;
  * Исключение - выбрасывается в случае невозможности приведения строки к формату денег
  * вида ddd...d.dd
  */
-public class IllegalMoneyFormatException extends RuntimeException{
+public class IllegalMoneyFormatException extends DFMainException{
     private String strValue;
     public String getStrValue() { return strValue; }
     public IllegalMoneyFormatException(String message, String strValue) {

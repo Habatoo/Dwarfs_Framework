@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models;
+package com.angrydwarfs.framework.models.UserPackage.SocialNetUser;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-import java.util.Set;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Profile {
-
-    private String displayName;
-    private String profilePictureUrl;
-    private Date birthday;
-    private Set<Address> addresses;
+public class FacebookUser {
+    private String id;
+    @JsonProperty("first_name")
+    private String firstName;
+    @JsonProperty("last_name")
+    private String lastName;
+    private String email;
+    private FacebookPicture picture;
 }

@@ -17,8 +17,7 @@
 package com.angrydwarfs.framework.models;
 
 import com.angrydwarfs.framework.models.Enums.EMainRole;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 

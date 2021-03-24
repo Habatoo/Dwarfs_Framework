@@ -1,6 +1,6 @@
 package com.angrydwarfs.framework.repository;
 
-import com.angrydwarfs.framework.models.User;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

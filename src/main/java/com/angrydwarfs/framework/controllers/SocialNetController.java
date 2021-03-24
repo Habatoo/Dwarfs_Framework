@@ -26,11 +26,16 @@ import com.angrydwarfs.framework.security.jwt.UserUtils;
 import com.angrydwarfs.framework.service.FacebookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Контроллер доступа через социальные сети.
@@ -38,7 +43,9 @@ import javax.validation.Valid;
  * @author habatoo
  *
  */
+
 @CrossOrigin(origins = "*", maxAge = 3600)
+@SpringBootApplication
 @RestController
 @RequestMapping("/api/auth/social")
 public class SocialNetController {
@@ -75,6 +82,12 @@ public class SocialNetController {
     @Value("${dwarfsframework.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
+    @GetMapping("/facebook")
+    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
+        return Collections.singletonMap("name", principal.getAttribute("name"));
+    }
+
+
     /**
      * @method authenticateUser - при http post запросе по адресу .../api/auth/login
      * @param facebookLoginRequest - запрос на доступ с параметрами пользователя facebook по facebook Id.
@@ -82,13 +95,13 @@ public class SocialNetController {
      * @return {@code ResponseEntity ответ}
      * @see FacebookLoginRequest
      */
-    @PostMapping("/facebook")
-    public ResponseEntity<?> facebookAuth(@Valid @RequestBody FacebookLoginRequest facebookLoginRequest) {
-        //log.info("facebook login {}", facebookLoginRequest);
-        JwtResponse jwtResponse = facebookService.loginUser(facebookLoginRequest.getAccessToken());
-
-        return ResponseEntity.ok(jwtResponse);
-    }
+//    @PostMapping("/facebook")
+//    public ResponseEntity<?> facebookAuth(@Valid @RequestBody FacebookLoginRequest facebookLoginRequest) {
+//        //log.info("facebook login {}", facebookLoginRequest);
+//        JwtResponse jwtResponse = facebookService.loginUser(facebookLoginRequest.getAccessToken());
+//
+//        return ResponseEntity.ok(jwtResponse);
+//    }
 
     /**
      * @method authenticateUser - при http post запросе по адресу .../api/oauth2/login
@@ -97,16 +110,16 @@ public class SocialNetController {
      * @return {@code ResponseEntity ответ}
      * @see LoginRequest
      */
-    @PostMapping("/facebooklogin")
-    public ResponseEntity<?> authenticateOauth2User(@Valid @RequestBody LoginRequest loginRequest) {
-
-        return ResponseEntity.ok(new MessageResponse("Post successfully!"));
-    }
-
-    @GetMapping("/facebook")
-    public ResponseEntity<?> testOauth2User() {
-        return ResponseEntity.ok(new MessageResponse("Get successfully!"));
-    }
+//    @PostMapping("/facebooklogin")
+//    public ResponseEntity<?> authenticateOauth2User(@Valid @RequestBody LoginRequest loginRequest) {
+//
+//        return ResponseEntity.ok(new MessageResponse("Post successfully!"));
+//    }
+//
+//    @GetMapping("/facebook")
+//    public ResponseEntity<?> testOauth2User() {
+//        return ResponseEntity.ok(new MessageResponse("Get successfully!"));
+//    }
 
 //    @GetMapping("/")
 //    public ResponseEntity<?> index(Model model,

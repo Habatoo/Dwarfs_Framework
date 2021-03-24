@@ -17,15 +17,10 @@
 package com.angrydwarfs.framework.controllers;
 
 import com.angrydwarfs.framework.models.*;
-import com.angrydwarfs.framework.models.Enums.ELevel;
-import com.angrydwarfs.framework.models.Enums.EMainRole;
-import com.angrydwarfs.framework.models.Enums.ETag;
-import com.angrydwarfs.framework.payload.request.SignupRequest;
-import com.angrydwarfs.framework.payload.request.UserEditRequest;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import com.angrydwarfs.framework.payload.response.MessageResponse;
 import com.angrydwarfs.framework.repository.*;
 import com.angrydwarfs.framework.security.jwt.UserUtils;
-import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +29,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.*;
 

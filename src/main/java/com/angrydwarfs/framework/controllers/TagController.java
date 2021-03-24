@@ -18,9 +18,8 @@ package com.angrydwarfs.framework.controllers;
 
 import com.angrydwarfs.framework.models.Enums.ELevel;
 import com.angrydwarfs.framework.models.Enums.ETag;
-import com.angrydwarfs.framework.models.Level;
 import com.angrydwarfs.framework.models.Tag;
-import com.angrydwarfs.framework.models.User;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import com.angrydwarfs.framework.payload.request.UserEditRequest;
 import com.angrydwarfs.framework.payload.response.MessageResponse;
 import com.angrydwarfs.framework.repository.*;

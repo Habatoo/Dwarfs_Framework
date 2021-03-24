@@ -18,7 +18,7 @@ package com.angrydwarfs.framework.repository;
 
 import com.angrydwarfs.framework.models.Activity;
 import com.angrydwarfs.framework.models.Tag;
-import com.angrydwarfs.framework.models.User;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

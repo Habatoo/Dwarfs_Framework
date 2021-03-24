@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models;
+package com.angrydwarfs.framework.exceptions;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public class DFMainException extends RuntimeException {
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class PictureData {
-    private String height;
-    private String width;
-    private String url;
+    public DFMainException(String message) {
+        super(message);
+    }
+
 }

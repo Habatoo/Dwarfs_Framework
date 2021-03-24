@@ -16,7 +16,7 @@
 
 package com.angrydwarfs.framework.security.jwt;
 
-import com.angrydwarfs.framework.models.User;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import com.angrydwarfs.framework.payload.response.MessageResponse;
 import com.angrydwarfs.framework.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

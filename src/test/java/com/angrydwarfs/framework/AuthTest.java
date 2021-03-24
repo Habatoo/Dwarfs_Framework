@@ -17,7 +17,7 @@
 package com.angrydwarfs.framework;
 
 import com.angrydwarfs.framework.controllers.AuthController;
-import com.angrydwarfs.framework.models.User;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import com.angrydwarfs.framework.payload.response.JwtResponse;
 import com.angrydwarfs.framework.repository.UserRepository;
 import com.angrydwarfs.framework.security.jwt.TokenUtils;

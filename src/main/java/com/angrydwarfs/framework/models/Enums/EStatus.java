@@ -16,7 +16,7 @@
 
 package com.angrydwarfs.framework.models.Enums;
 
-import com.angrydwarfs.framework.models.Status;
+import com.angrydwarfs.framework.models.UserPackage.Status;
 
 /**
  * Перечень возможных статусов аккаунта пользователя.

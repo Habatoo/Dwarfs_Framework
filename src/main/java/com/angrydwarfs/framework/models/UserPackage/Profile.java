@@ -14,31 +14,25 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.payload.request;
+package com.angrydwarfs.framework.models.UserPackage;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.Setter;
+import com.angrydwarfs.framework.models.Address;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Set;
 
-@Getter
-@Setter
-public class ActivityRequest {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Profile {
 
-    @NotBlank
-    @Size(min = 3, max = 20)
-    private String activityTitle;
-    @NotBlank
-    @Size(min = 3, max = 500)
-    private String activityBody;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime creationDate;
-
-    private Set<String> tags;
-
+    private String displayName;
+    private String profilePictureUrl;
+    private Date birthday;
+    private Set<Address> addresses;
 }

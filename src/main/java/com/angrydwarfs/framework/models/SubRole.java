@@ -17,8 +17,7 @@
 package com.angrydwarfs.framework.models;
 
 import com.angrydwarfs.framework.models.Enums.ESubRole;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import lombok.*;
 
 import javax.persistence.*;

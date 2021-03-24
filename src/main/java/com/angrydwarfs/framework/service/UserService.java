@@ -19,7 +19,7 @@ package com.angrydwarfs.framework.service;
 import com.angrydwarfs.framework.exceptions.EmailAlreadyExistsException;
 import com.angrydwarfs.framework.exceptions.UsernameAlreadyExistsException;
 import com.angrydwarfs.framework.models.MainRole;
-import com.angrydwarfs.framework.models.User;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import com.angrydwarfs.framework.repository.UserRepository;
 import com.angrydwarfs.framework.security.jwt.JwtUtils;
 import lombok.extern.slf4j.Slf4j;

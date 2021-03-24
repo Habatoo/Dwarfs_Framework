@@ -17,19 +17,16 @@
 package com.angrydwarfs.framework.controllers;
 
 import com.angrydwarfs.framework.models.Activity;
-import com.angrydwarfs.framework.models.User;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import com.angrydwarfs.framework.repository.ActivityRepository;
-import com.angrydwarfs.framework.repository.TokenRepository;
 import com.angrydwarfs.framework.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.UUID;
 
 

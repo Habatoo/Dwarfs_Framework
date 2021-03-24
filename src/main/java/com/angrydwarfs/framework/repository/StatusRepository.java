@@ -17,7 +17,7 @@
 package com.angrydwarfs.framework.repository;
 
 import com.angrydwarfs.framework.models.Enums.EStatus;
-import com.angrydwarfs.framework.models.Status;
+import com.angrydwarfs.framework.models.UserPackage.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

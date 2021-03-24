@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models;
+package com.angrydwarfs.framework.models.UserPackage;
 
+import com.angrydwarfs.framework.models.*;
 import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -57,7 +58,7 @@ import java.util.Set;
 //@Builder
 @NoArgsConstructor
 @Table(name = "USR")
-@ToString(of = {"id", "userName", "password", "userEmail", "creationDate", "activationStatus"})
+@ToString(of = {"id", "username", "password", "userEmail", "creationDate", "activationStatus"})
 @EqualsAndHashCode(of = {"id"})
 public class User implements Serializable, UserDetails {
     private static final long serialVersionUID = -1399500801576919731L;

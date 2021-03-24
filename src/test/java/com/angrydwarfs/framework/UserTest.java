@@ -3,6 +3,8 @@ package com.angrydwarfs.framework;
 import com.angrydwarfs.framework.controllers.UserController;
 import com.angrydwarfs.framework.models.*;
 import com.angrydwarfs.framework.models.Enums.*;
+import com.angrydwarfs.framework.models.UserPackage.Status;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import com.angrydwarfs.framework.payload.response.JwtResponse;
 import com.angrydwarfs.framework.repository.TokenRepository;
 import com.angrydwarfs.framework.repository.UserRepository;

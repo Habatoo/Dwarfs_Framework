@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models;
+package com.angrydwarfs.framework.models.UserPackage.SocialNetUser;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

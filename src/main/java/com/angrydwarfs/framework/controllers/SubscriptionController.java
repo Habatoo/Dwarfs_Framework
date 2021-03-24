@@ -16,15 +16,12 @@
 
 package com.angrydwarfs.framework.controllers;
 
-import com.angrydwarfs.framework.models.User;
-import com.angrydwarfs.framework.payload.response.MessageResponse;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import com.angrydwarfs.framework.repository.UserRepository;
 import com.angrydwarfs.framework.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;

@@ -16,7 +16,7 @@
 
 package com.angrydwarfs.framework.exceptions;
 
-public class FileStorageException extends RuntimeException{
+public class FileStorageException extends DFMainException{
 
     public FileStorageException(String message) {
         super(message);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.angrydwarfs.framework.models;
+package com.angrydwarfs.framework.models.UserPackage;
 
 import com.angrydwarfs.framework.models.Enums.EStatus;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;

@@ -16,7 +16,7 @@
 
 package com.angrydwarfs.framework.service.client;
 
-import com.angrydwarfs.framework.models.FacebookUser;
+import com.angrydwarfs.framework.models.UserPackage.SocialNetUser.FacebookUser;
 import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

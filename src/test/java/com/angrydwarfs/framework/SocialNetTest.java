@@ -19,6 +19,7 @@ package com.angrydwarfs.framework;
 import com.angrydwarfs.framework.controllers.AuthController;
 import com.angrydwarfs.framework.controllers.SocialNetController;
 import com.angrydwarfs.framework.controllers.UserController;
+import com.angrydwarfs.framework.models.UserPackage.User;
 import com.angrydwarfs.framework.payload.request.FacebookLoginRequest;
 import com.angrydwarfs.framework.payload.response.JwtResponse;
 import com.angrydwarfs.framework.repository.TokenRepository;
@@ -27,6 +28,7 @@ import com.angrydwarfs.framework.security.jwt.TokenUtils;
 import com.angrydwarfs.framework.service.FacebookService;
 import com.angrydwarfs.framework.service.client.FacebookClient;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +45,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -96,5 +99,26 @@ public class SocialNetTest {
     public void loadControllers() {
         assertThat(socialNetController).isNotNull();
     }
+
+    @Test
+    //@DisplayName("Проверяет создание пользователя с ролями ADMIN, MOD и USER.")
+    public void testCreateAdmin() throws Exception{
+        this.mockMvc.perform(post("/api/auth/social/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"userName\": \"testmod\", \"email\": \"testmod@mod.com\", \"password\": \"12345\", \"role\": [\"admin\", \"mod\", \"user\"] }"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("User registered successfully!"));
+
+        User user = userRepository.findByUsername("testmod").get();
+        JwtResponse jwtResponse = tokenUtils.makeAuth(user.getUsername(), password);
+        tokenUtils.makeToken("testmod", jwtResponse.getToken());
+        System.out.println("AuthTest.testCreateAdmin " + user.getMainRoles().toString());
+        Assert.assertTrue(user.getMainRoles().toString().contains("ROLE_ADMINISTRATOR"));
+        Assert.assertTrue(user.getMainRoles().toString().contains("ROLE_USER"));
+        Assert.assertTrue(user.getMainRoles().toString().contains("ROLE_MODERATOR"));
+        Assert.assertTrue(user.getSubRoles().toString().contains("COMMON_USER"));
+        Assert.assertTrue(user.getUserEmail().contains("testmod@mod.com"));
+    }
+
 
 }

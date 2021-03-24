@@ -31,5 +31,4 @@ public final class Views {
 
     public interface AdminData extends ModData {}
 
-
 }
